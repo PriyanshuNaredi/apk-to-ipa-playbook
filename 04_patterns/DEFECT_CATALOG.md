@@ -789,6 +789,46 @@ not just the green tick.
 
 ---
 
+## 46. A law that answered about a different two hours
+
+**Symptom:** a summary sentence and a chart that contradict each other. Ours read
+"Precipitation soon — expected to start at 2:15 AM" above a chart whose axis ran
+17:30–19:30 and whose bars were all zero. Both halves were "ported correctly".
+
+**Cause:** the law and the chart were ported from the same upstream file, but the *series*
+was not. Upstream's providers hand it a list that begins **now** and covers about two
+hours; the replacement API hands over a list that begins at **local midnight** and runs for
+days. "Is the first step wet?" therefore asked a question about 00:00, and "the first wet
+step" found rain nine hours away. Nothing in either port was wrong in isolation.
+
+**Fix:** clip the series to the rendered span before applying any law to it, in one place:
+
+```swift
+func relative(to now: Date, span: TimeInterval) -> Series {
+    let inWindow = steps.filter {
+        $0.date.addingTimeInterval(stepInterval) > now && $0.date < now.addingTimeInterval(span)
+    }
+    return Series(steps: inWindow.isEmpty ? [steps.last].compactMap { $0 } : inWindow)
+}
+```
+
+Two properties worth keeping: the sentence and the chart can no longer describe different
+windows, and a card with nothing to say still has an axis and says "none" rather than
+disappearing.
+
+**The general rule:** when the replacement data differs from the original's in *origin,
+length or resolution*, every law that reads the series needs a clip or a resample, and the
+clip belongs in the data layer where a test can reach it. This one cost a full visual
+review cycle because the empty chart looked like a drawing bug.
+
+**Also in the same card:** a threshold label drawn above its line is clipped when the line
+is the topmost one; flip the anchor within ~14 pt of the top of the plot.
+
+**Write this test:** a series that is dry inside the window and wet outside it must read
+"no precipitation", not "starting soon".
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash

@@ -81,6 +81,8 @@ screenshot is not a tick.
       defect §43
 - [ ] Frame rate measured, not assumed; a setting exists to pause the animation — defect §43
 - [ ] The test gate counts every framework in the output and prints the split — defect §44
+- [ ] Every law applied to a fetched series is clipped or resampled to the rendered span
+      first, in the data layer, with a test — defect §46
 - [ ] `permissions: contents: write` declared before the first tag, and the release asset's
       size checked by API rather than assumed — defect §45
 - [ ] Every UI identifier on a leaf or on a link/container declared with `children: .contain`; every

@@ -35,7 +35,7 @@ says "this happens" and you want to know how it actually looked.
 
 | Layer | Directory | What it gives you |
 |---|---|---|
-| **Playbook** (reusable) | `01_method/`, `04_patterns/` | 10 stages plus 7 non-visual subsystem docs, entry/exit gates, Compose→SwiftUI mapping tables, 45 catalogued defects, checklists |
+| **Playbook** (reusable) | `01_method/`, `04_patterns/` | 10 stages plus 7 non-visual subsystem docs, entry/exit gates, Compose→SwiftUI mapping tables, 46 catalogued defects, checklists |
 | **Case study** | `02_case_study/`, `03_rea/`, `06_evidence/` | commit-by-commit timeline, defects with root cause and proof, parity ledger, a measured atlas of [Breezy Weather 6.2.2](https://github.com/breezy-weather/breezy-weather), REA findings we acted on, screenshots and logs |
 
 ## The 10 stages
