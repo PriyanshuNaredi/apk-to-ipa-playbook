@@ -65,6 +65,11 @@ running anything.
 three two-column rows, with rows of unequal height because one card has a second line. That ragged
 height is what the Android grid does too; a SwiftUI `LazyVGrid` would stretch them level and lose it.
 
+`screenshots/gust-nowcast.png` shows the nowcast card: four short bars for a light drizzle on an
+absolute scale, with the window moved to begin at the first wet step ("from 09:15") because the rain
+was seven hours out. The bars are deliberately small — upstream scales to a fixed heavy threshold,
+not to the window's peak.
+
 `screenshots/gust-cards-airquality.png` shows the air-quality card from the second Open-Meteo
 endpoint (AQI 37, "Fair", PM2.5 10.7 µg/m³) and, at the bottom, a lone half-size card sitting at
 half width beside empty space rather than stretched — the `halfAlone` branch of the layout rule.

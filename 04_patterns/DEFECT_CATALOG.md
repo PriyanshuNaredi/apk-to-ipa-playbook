@@ -348,6 +348,29 @@ and then it will fail in CI on someone else's branch.
 
 ---
 
+## 23. A card that is internally consistent and still lies
+
+**Symptom:** the nowcast card's title said "Rain starting" over a strip of empty bars. Every
+number in it was correct.
+
+**Cause:** two independently correct decisions that do not compose. The title is derived from the
+**whole** series (first and last step), while the chart drew a **fixed 2-hour window**. Rain seven
+hours away satisfies the title and leaves the window empty.
+
+**Fix:** when rain falls outside the drawn window, start the window just before the first wet step
+and label it ("from 09:15"). The card then states the same thing in both places.
+
+**Generalisation:** for any card with a headline plus a picture, assert that the headline's claim is
+*visible in the picture*. A UI test cannot see this, so make it a unit test on the windowing
+function: `window(maxSteps:)` must contain at least one non-zero value whenever the state is not
+`.none`.
+
+**Related:** the same card had auto-scaled its bars to the window's peak, which makes a drizzle fill
+the card. Upstream uses an absolute scale topping out at 15 mm/h. Auto-scaling a chart to its own
+data hides the one comparison the user cares about.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash
