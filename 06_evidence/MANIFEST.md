@@ -61,6 +61,10 @@ ported client from Open-Meteo (Berlin: 1.6 °C, 10.0 km/h, 88 %, 1017.5 hPa), de
 response types and rendered through the ported units — committed so the claim is checkable without
 running anything.
 
+`screenshots/gust-cards-half-rule.png` shows the half/full card rule working: six half-size cards in
+three two-column rows, with rows of unequal height because one card has a second line. That ragged
+height is what the Android grid does too; a SwiftUI `LazyVGrid` would stretch them level and lose it.
+
 `screenshots/gust-shell-stage4.png` is the stage-4 gate from that port: the app target running on a
 simulator with no signing identity, showing values computed by the ported units package
 (humidex 31.0 °C at 25 °C / 18 °C dew point; wind chill correctly absent above 10 °C).
