@@ -61,6 +61,8 @@ rewrite.
 3. `04_patterns/DEFECT_CATALOG.md` — the defects that recur across ports, and the *test* that
    catches each. Write those tests before the screens.
 4. `04_patterns/CHECKLISTS.md` — the gates as tickable lists.
+   `04_patterns/PROJECT_SHAPE.md` — package-vs-app split, and the XcodeGen traps.
+   `00_overview/LICENCES.md` — what the upstream licence makes you ship and how to name it.
 5. `05_tools/` — copy-paste scripts: build, test, visual audit, unsigned IPA, icon rendering.
 
 ### Starting from an APK with no source
@@ -80,13 +82,14 @@ output committed at `06_evidence/recon-baseline/`.
 ## Repo map
 
 ```
-00_overview/     why port at all, what it cost, glossary
+00_overview/     why port at all, what it cost, glossary, licence obligations
 01_method/       the 10 stages, one file each
 02_case_study/   timeline, defects, parity ledger, metrics
 03_rea/          what REA is, which findings we used, evidence index + vendored evidence
-04_patterns/     Compose→SwiftUI tables, defect catalog, checklists
+04_patterns/     Compose→SwiftUI tables, project shape, defect catalog, checklists
 05_tools/        scripts (recon, build, tests, visual audit, IPA, icon)
-06_evidence/     screenshots, the port's CHANGELOG / audit / verification docs, recon baseline
+06_evidence/     screenshots, the port's CHANGELOG / audit / verification docs,
+                 recon baselines (Weather + Breezy)
 ```
 
 ## Provenance

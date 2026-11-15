@@ -208,7 +208,7 @@ LIBPREFIXES='^(mtrl_|abc_|androidx_|com_google_android_|notification_|call_notif
   for f in $(find "$DECODED/res" -name "strings.xml" 2>/dev/null | sort); do
     total=$(grep -c "<string " "$f" 2>/dev/null || true)
     kept=$(sed -n 's/.*<string name="\([^"]*\)">\(.*\)<\/string>/\1/p' "$f" | grep -Evc "$LIBPREFIXES" || true)
-    [ "${total:-0}" -eq 0 ] && continue
+    [ "${total:-0}" -eq 0 ] && continue || true
     echo "## ${f#"$DECODED"/}   ($kept of $total keys look app-owned)"
     sed -n 's/.*<string name="\([^"]*\)">\(.*\)<\/string>/\1 = \2/p' "$f" | grep -Ev "$LIBPREFIXES" || true
     echo
@@ -230,7 +230,9 @@ LIBPREFIXES='^(mtrl_|abc_|androidx_|com_google_android_|notification_|call_notif
   echo "# vector drawables (icon candidates + their pathData)"
   # a quoted glob is a literal path: use -path instead
   find "$DECODED/res" -path "*drawable*" -name "*.xml" 2>/dev/null | while read -r f; do
-    grep -q "<vector" "$f" && echo "vector: ${f#"$DECODED"/} $(grep -c 'pathData' "$f") path(s)"
+    if grep -q "<vector" "$f"; then
+      echo "vector: ${f#"$DECODED"/} $(grep -c 'pathData' "$f" || true) path(s)"
+    fi
   done
 } > "$OUT/06-resources.txt"
 
@@ -275,9 +277,18 @@ rm -f "$OUT/07-package.json.tmp"
 # own classes -- a library using HorizontalPager says nothing about this app.
 {
   echo "# framework"
-  if grep -rqs "androidx.compose" "$APP_DIR"; then echo "Compose (androidx.compose.*) - declarative"; else echo "no androidx.compose in app classes - likely Views/XML layouts"; fi
+  # -i matters: the first version searched for lowercase "hilt" and missed the
+  # 32 generated `Hilt_*` classes in a Hilt app, reporting "no DI framework".
+  if grep -rqs "androidx.compose" "$APP_DIR"; then echo "Compose present in app classes"; else echo "no androidx.compose in app classes - Views/XML layouts"; fi
   if grep -rqs "androidx.fragment" "$APP_DIR"; then echo "Fragments used by app classes: there IS a navigation graph to port"; else echo "No app-owned fragments (library hits ignored)"; fi
-  if grep -rqs "dagger\.\|hilt" "$APP_DIR"; then echo "DI in app classes: replace with explicit injection or @Observable"; else echo "No DI framework in app classes"; fi
+  for di in dagger hilt koin kodein; do
+    if grep -rqsi "$di" "$APP_DIR"; then echo "DI: $di present in app classes"; fi
+  done
+  if grep -rqs "RecyclerView" "$APP_DIR"; then echo "RecyclerView used by app classes: stage 6 has View-system list work, not only Compose"; fi
+  if grep -rqs "ComposeView" "$APP_DIR"; then echo "ComposeView interop: Compose embedded in View hierarchy (check which is primary)"; fi
+  if grep -rqs "AppWidgetProvider\|RemoteViews" "$APP_DIR"; then echo "Home-screen widgets present: NO iOS equivalent (WidgetKit is a different product)"; fi
+  if grep -rqs "LiveWallpaper\|WallpaperService" "$APP_DIR"; then echo "Live wallpaper present: NO iOS equivalent at all"; fi
+  if grep -rqs "FOREGROUND_SERVICE\|AlarmManager\|WorkManager" "$APP_DIR" || grep -q "FOREGROUND_SERVICE" "$DECODED/AndroidManifest.xml" 2>/dev/null; then echo "Background work beyond resume refresh: iOS BGTaskScheduler cannot do the same thing"; fi
   echo
   echo "# structural markers in app classes (files containing each)"
   for m in LazyColumn LazyRow LazyVerticalGrid verticalScroll horizontalScroll HorizontalPager \
@@ -286,7 +297,7 @@ rm -f "$OUT/07-package.json.tmp"
     # `|| true` is load-bearing: grep exits 1 with no matches, and pipefail turns
     # that into a failed substitution, which set -e treats as fatal.
     n=$(grep -rl "$m" "$APP_DIR" 2>/dev/null | wc -l | tr -d ' ' || true)
-    [ "$n" -gt 0 ] && printf "%-22s %s\n" "$m" "$n"
+    if [ "$n" -gt 0 ]; then printf "%-22s %s\n" "$m" "$n"; fi
   done
   echo
   echo "# entry points (app classes with onCreate)"
@@ -296,6 +307,15 @@ rm -f "$OUT/07-package.json.tmp"
   echo
   echo "# obfuscation signal (app classes with 1-2 char names)"
   echo "short-named app files: $(find "$APP_DIR" \( -name "?.java" -o -name "??.java" \) 2>/dev/null | wc -l | tr -d ' ' || true) of $APP_FILES"
+  echo
+  echo "# jadx package renames (collision with a library package)"
+  RENAMED=$(find "$DEC/sources" -maxdepth 3 -type d -name "p0[0-9][0-9]" 2>/dev/null | head -6 | sed "s|$DEC/sources/||" || true)
+  if [ -n "$RENAMED" ]; then echo "$RENAMED"; echo "(paths in this report use those names; source paths differ)"; else echo "none"; fi
+  echo
+  echo "# where the code actually lives (app subpackages, by class count)"
+  find "$APP_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | while read -r d; do
+    printf "%-28s %5s\n" "$(basename "$d")" "$(find "$d" -name '*.java' 2>/dev/null | wc -l | tr -d ' ' || true)"
+  done | sort -k2 -rn | head -12
   echo
   echo "# size"
   echo "app:     $APP_FILES java files, $APP_LOC lines"

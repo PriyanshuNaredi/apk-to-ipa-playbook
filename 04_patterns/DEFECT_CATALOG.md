@@ -218,6 +218,39 @@ array index instead of entity id.
 
 ---
 
+## 16. `BUILD SUCCEEDED`, app will not install (missing `CFBundleVersion`)
+
+**Symptom:** `xcodebuild` reports success; `simctl install` fails with
+`The application's Info.plist does not contain a valid CFBundleVersion` (NSPOSIXErrorDomain, code 22).
+
+**Cause:** `GENERATE_INFOPLIST_FILE: YES` plus an explicit `info: path:` in the XcodeGen spec — the
+plist is written from `info.properties`, so no version keys are present.
+
+**Fix:** drop `GENERATE_INFOPLIST_FILE`; state `CFBundleShortVersionString` and `CFBundleVersion`.
+Assert them in the build script so a green build cannot mean an uninstallable app.
+
+**Write this test:** the build script fails if `PlistBuddy :CFBundleVersion` is missing.
+
+---
+
+## 17. Sizing the port from the wrong class count
+
+**Symptom:** nobody agrees on the estimate; one person says "2,000 lines", another says "weeks".
+
+**Cause:** a decompiled tree contains the app **and** every bundled library. Counting them together
+reported 19,271 classes / 3.85 M lines for an app whose own code is 43 classes — and made framework
+heuristics fire on code the author never wrote ("Fragments found", "DI found" on a pure-Compose app
+with no DI).
+
+**Fix:** scope every count to the manifest's own package, and print the subpackage breakdown — the
+shape decides the schedule. On a 1,204-class app, 1,097 of those classes were 53 weather-provider
+integrations, i.e. 91 % of the code was *one feature that is also the one you must cut*.
+
+**Write this test:** recon output must state app classes, bundled classes, and the top subpackages
+separately (`05_tools/apk-recon.sh` does).
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash

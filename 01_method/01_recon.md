@@ -74,6 +74,28 @@ Two of its outputs decide scope before any design work:
 - **App classes vs bundled library classes.** The first version of the script counted both and
   reported 19,271 classes; the app was 43. Size the work from the app's own package only.
 
+## Sizing: what the numbers decide
+
+Recon on a second, much larger app produced a useful threshold table. Fill these in before promising
+anything:
+
+| Measure | Small (port in sittings) | Large (needs a scope decision) | Breezy 6.2.2 |
+|---|---|---|---|
+| App classes (own package) | < 200 | > 500 | 1,204 |
+| Activities/screens | 1–5 | > 10 | 26 |
+| Localizations | 1 | > 20 | 100 |
+| Network integrations | 1–3 | > 10 | 53 |
+| Platform-only features | none | any | live wallpaper, widgets, boot/alarm, tile service |
+
+Two rules that follow:
+
+1. **Where the code lives decides the plan more than how much there is.** 91 % of Breezy's classes
+   sat in `sources/` (provider integrations); the entire UI was 35 classes. Size the *feature*, not
+   the repository.
+2. **A feature with no iOS counterpart is a scope change, not a task.** Live wallpaper, RemoteViews
+   widgets, `AlarmManager`/boot receivers, status-bar tiles and cross-app content providers have no
+   equivalent to port *to*. Name them in stage 1 and get them cut in writing.
+
 ## Anti-patterns
 
 - Designing the iOS architecture during recon. You will port your design, not the app.

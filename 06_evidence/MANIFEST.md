@@ -45,6 +45,21 @@ It rediscovered: Compose, no app-owned fragments, no DI, `HorizontalPager` ×1, 
 `CN=Weather Personal` certificate. The decompiled tree (274 MB) and decoded resources (435 MB) are
 not vendored.
 
+## Second port: Breezy Weather 6.2.2 (`breezy-recon/`)
+
+Recon output for a very different app — 1,204 app classes, 26 activities, 100 locales, 53 network
+sources, plus live wallpaper and RemoteViews widgets. Kept because it is the worked example behind
+`sizing` in `01_method/01_recon.md` and behind defect #17 (counting library classes as the app):
+
+- the checksum matches the official release asset, so the analysed binary is the shipped one
+- 1,097 of 1,204 classes sit in one subpackage (`sources/`), which is what turned "port the app"
+  into "cut 91 % of it and port the UI"
+- nine permissions have no iOS counterpart, stated as decisions rather than discovered later
+
+`screenshots/gust-shell-stage4.png` is the stage-4 gate from that port: the app target running on a
+simulator with no signing identity, showing values computed by the ported units package
+(humidex 31.0 °C at 25 °C / 18 °C dew point; wind chill correctly absent above 10 °C).
+
 ## Deliberately not vendored
 
 - **The APK** (~7 MB) and the decompiled sources tree (~60 MB): the analysed artifact is described
