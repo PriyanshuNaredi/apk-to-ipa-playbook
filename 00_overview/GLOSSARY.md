@@ -23,13 +23,13 @@ free-account slots; distributes a combined `LiveContainer + SideStore` build.
 **REA (`rea-agents`)** — reverse-engineering analysis CLI/MCP server (MIT,
 [morluto/rea](https://github.com/morluto/rea)). Wraps jadx and apktool behind commands that
 dump signature, manifest, package inventory, and per-method bytecode as JSON. Used in the case
-study for evidence; see `03_rea/WHAT_REA_IS.md`.
+study for evidence; see `../03_rea/WHAT_REA_IS.md`.
 
 **jadx** — DEX → Java decompiler. **apktool** — resource-manifest unpacker (keeps the original
 resource IDs and `res/` layout).
 
 **Compose** — Jetpack Compose: declarative Android UI toolkit. The mental model maps to SwiftUI
-more closely than the API names suggest; see `04_patterns/COMPOSE_TO_SWIFTUI.md`.
+more closely than the API names suggest; see `../04_patterns/COMPOSE_TO_SWIFTUI.md`.
 
 **Remembers / state** — Compose `remember`/`rememberSaveable` ≡ SwiftUI `@State` /
 `@SceneStorage`. Compose `LaunchedEffect(key)` ≡ `.task(id:)`. Compose `derivedStateOf` ≡ a

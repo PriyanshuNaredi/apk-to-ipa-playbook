@@ -1,7 +1,7 @@
 # Stage 6 — UI port
 
 Screens, in navigation order, against the parity spec. The mechanics are mostly
-`04_patterns/COMPOSE_TO_SWIFTUI.md`; this file is about *process* and the layout traps that a
+`../04_patterns/COMPOSE_TO_SWIFTUI.md`; this file is about *process* and the layout traps that a
 mapping table cannot warn you about.
 
 ## Order of work
@@ -46,7 +46,7 @@ then testing `midX == window.midX` within 1 pt, made it unarguable.
 ## Wording is part of the screen
 
 Every string comes from the original, including awkward ones ("Interpolated model temperature").
-Two exceptions, both documented in `02_case_study/PARITY_LEDGER.md`:
+Two exceptions, both documented in `../02_case_study/PARITY_LEDGER.md`:
 
 - The footer credits the port author **and** the original author.
 - The diagnostics surface (no Android counterpart) moved from the bar into Settings, where it does

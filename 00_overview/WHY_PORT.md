@@ -46,4 +46,4 @@ to earn it.
 | Verification, visual audit, defect fixing | ~15% | Where the port stops lying to itself |
 
 Two thirds of the schedule is translation. The last third — making it *indistinguishable* — is
-where ports fail, and it is why `01_method/08_verification.md` exists.
+where ports fail, and it is why `../01_method/08_verification.md` exists.

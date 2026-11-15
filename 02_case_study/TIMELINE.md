@@ -8,7 +8,7 @@ Commits referenced from the port repository (`PriyanshuNaredi/weather-ios-port`)
 
 `SwiftPM` package + `xtool` cross-compile, never executed on a device. Value: it forced the data
 layer and every screen into existence as *code*, and it produced the first `WeatheriOS.ipa`
-(packaged, unsigned, unlaunchable). Lesson recorded in `01_method/04_scaffolding.md`: a build
+(packaged, unsigned, unlaunchable). Lesson recorded in `../01_method/04_scaffolding.md`: a build
 system nobody runs is not verified.
 
 ## Sitting 2 — macOS/Xcode bring-up (`7104089`)

@@ -3,6 +3,11 @@
 Copy these into the next port's `PROJECT_STATUS.md` and tick as you go. Each item is a command or
 an observation, never a feeling.
 
+> **Second edition:** `PORTING_CHECKLIST_V2.md` in this directory covers the same stages plus the
+> non-visual subsystems (manifest surfaces, provider seam, cache validity, locale defaults,
+> localization, data completion, alerts and notifications). If the app being ported is larger
+> than a handful of screens, start there and use this file for the visual specifics.
+
 ## Stage 1 — Recon
 
 - [ ] APK checksum recorded, and the tag/version being ported is pinned

@@ -38,7 +38,7 @@ have shipped a release note lying about signing.
 
 ## What to do differently on the next port
 
-1. **Write the defect tests first**, from `04_patterns/DEFECT_CATALOG.md`. Nine of this port's 15
+1. **Write the defect tests first**, from `../04_patterns/DEFECT_CATALOG.md`. Nine of this port's 15
    defects are in that catalog already; the tests exist for them just as soon as the code does.
 2. **Instrument before porting the map**: log frame transitions and tile cache hits from day one.
    The map's defects were all temporal.
@@ -62,5 +62,5 @@ tools. What that changed:
 
 ## Exit gate
 
-- `04_patterns/DEFECT_CATALOG.md` has at least one new or corrected entry from this port.
-- The next port's first commit can start from `04_patterns/CHECKLISTS.md` without editing it.
+- `../04_patterns/DEFECT_CATALOG.md` has at least one new or corrected entry from this port.
+- The next port's first commit can start from `../04_patterns/CHECKLISTS.md` without editing it.

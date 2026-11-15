@@ -25,6 +25,14 @@ Get readable-or-decompiled code for every screen. Same repo, APK-only, or a mix.
 **Gate:** no screen exists only as "I remember how it looked".
 → `02_source_recovery.md`
 
+> With full source available, the recon stage grows a second half that screenshots cannot show:
+> the manifest (components, permissions), the source/provider architecture, refresh and cache
+> rules, locale and unit defaults, data completion and alert rules. See
+> `11_surface_map.md`, `12_source_architecture.md`, `13_refresh_and_cache.md`,
+> `14_units_and_locale.md`, `15_localization.md`, `16_data_completion.md`,
+> `17_alerts_and_notifications.md`, and the measured inventory in
+> `../02_case_study/UPSTREAM_ATLAS.md`.
+
 ## Stage 3 — Parity spec
 One table: Android behaviour → iOS implementation → the test that will prove it. Written before
 UI code.
@@ -69,6 +77,10 @@ README alone.
 Which defects bit, which gates caught them, what the next port should test first.
 **Gate:** the defect catalog in `04_patterns/` gained or corrected at least one entry.
 → `10_retrospective.md`
+
+> If the port was driven by screens, the retrospective's most valuable output is the list of
+> **non-visual** subsystems it never touched: providers, caches, defaults, localization, alerts,
+> background policy. `../04_patterns/PORTING_CHECKLIST_V2.md` is that list, already consolidated.
 
 ## Rules that cut across all stages
 

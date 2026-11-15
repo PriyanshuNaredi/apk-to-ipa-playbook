@@ -44,7 +44,7 @@ view.
    (`maxDiskBytes = 48 * 1024 * 1024` with an eviction test).
 6. **Cancellation is part of the contract.** Any repository call the UI can abandon must be
    cancellation-aware. Two of this port's worst defects lived here; see
-   `02_case_study/DEFECTS.md` D3/D4.
+   `../02_case_study/DEFECTS.md` D3/D4.
 
 ## The two defects this layer produced
 

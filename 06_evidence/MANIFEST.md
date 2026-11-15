@@ -49,7 +49,7 @@ not vendored.
 
 Recon output for a very different app — 1,204 app classes, 26 activities, 100 locales, 53 network
 sources, plus live wallpaper and RemoteViews widgets. Kept because it is the worked example behind
-`sizing` in `01_method/01_recon.md` and behind defect #17 (counting library classes as the app):
+`sizing` in `../01_method/01_recon.md` and behind defect #17 (counting library classes as the app):
 
 - the checksum matches the official release asset, so the analysed binary is the shipped one
 - 1,097 of 1,204 classes sit in one subpackage (`sources/`), which is what turned "port the app"
@@ -106,9 +106,9 @@ simulator with no signing identity, showing values computed by the ported units 
 - **The unsigned IPA**: reproducible with `05_tools/ipa-build.sh`; it is 1.2 MB of build output, not
   evidence of method.
 - **`07_logs/` session logs**: the one excerpt that matters (radar frames 2/13 → 13/13) is quoted
-  in `02_case_study/METRICS.md` with the command to re-derive it.
+  in `../02_case_study/METRICS.md` with the command to re-derive it.
 
 ## Provenance rule
 
-If a claim in this repo has no file behind it here, it is in `02_case_study/METRICS.md` as
+If a claim in this repo has no file behind it here, it is in `../02_case_study/METRICS.md` as
 *not measured*, or it does not appear at all.

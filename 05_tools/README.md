@@ -38,7 +38,7 @@ Command Line Tools. The prebuilt route is minutes and deletes cleanly.
 ### Four bugs in the first version, all found by testing against a known APK
 
 It was validated on `Weather_v1.1.1.apk` — an app whose architecture is already documented in
-`02_case_study/PARITY_LEDGER.md` — with the sha256 compared to the recorded baseline. That is
+`../02_case_study/PARITY_LEDGER.md` — with the sha256 compared to the recorded baseline. That is
 the only way to trust a recon tool: run it on something you already know the answer to.
 
 1. `producer | grep -q` under `set -o pipefail` — exit on SIGPIPE read as failure. The exact trap
@@ -91,7 +91,7 @@ exported nothing and still exited 0.
 The capture names are the contract: `audit-01-empty` … `audit-10-map-temperature`. Those names are
 referenced by the playbook and the case study, which is why they are stable.
 
-## `ipa-build.sh` (see `01_method/09_release.md`)
+## `ipa-build.sh` (see `../01_method/09_release.md`)
 
 Device `Release` build with signing disabled, packaged as `Payload/<Name>.app` inside a `.ipa`, plus
 a `.sha256`. Then it **proves** the unsigned state: no `_CodeSignature`, no

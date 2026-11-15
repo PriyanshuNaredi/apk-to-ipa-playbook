@@ -19,8 +19,8 @@ happens" and you want to know how it actually looked.
 
 | Layer | Directory | What it gives you |
 |---|---|---|
-| **Playbook** (reusable) | `01_method/`, `04_patterns/` | 10 stages with entry/exit gates, Compose→SwiftUI mapping tables, the defect catalog, checklists |
-| **Case study** (this app) | `02_case_study/`, `03_rea/`, `06_evidence/` | commit-by-commit timeline, 15 defects with root cause and proof, parity ledger, REA findings we acted on, screenshots and logs |
+| **Playbook** (reusable) | `01_method/`, `04_patterns/` | 10 stages plus 7 non-visual subsystem docs, entry/exit gates, Compose→SwiftUI mapping tables, 36 catalogued defects, checklists |
+| **Case study** (this app + the second, larger upstream) | `02_case_study/`, `03_rea/`, `06_evidence/` | commit-by-commit timeline, defects with root cause and proof, parity ledger, a measured atlas of Breezy Weather 6.2.2, REA findings we acted on, screenshots and logs |
 
 ## The 10 stages
 
@@ -61,6 +61,9 @@ rewrite.
 3. `04_patterns/DEFECT_CATALOG.md` — the defects that recur across ports, and the *test* that
    catches each. Write those tests before the screens.
 4. `04_patterns/CHECKLISTS.md` — the gates as tickable lists.
+   `04_patterns/PORTING_CHECKLIST_V2.md` — the same, extended to the non-visual subsystems
+   (providers, caches, locale defaults, notifications, alerts); use this one for a port of an
+   app that is more than a few screens.
    `04_patterns/PROJECT_SHAPE.md` — package-vs-app split, and the XcodeGen traps.
    `00_overview/LICENCES.md` — what the upstream licence makes you ship and how to name it.
 5. `05_tools/` — copy-paste scripts: build, test, visual audit, unsigned IPA, icon rendering.
@@ -83,14 +86,32 @@ output committed at `06_evidence/recon-baseline/`.
 
 ```
 00_overview/     why port at all, what it cost, glossary, licence obligations
-01_method/       the 10 stages, one file each
-02_case_study/   timeline, defects, parity ledger, metrics
+01_method/       the stages, one file each (01–10) plus the non-visual subsystems (11–17)
+02_case_study/   timeline, defects, parity ledger, metrics, upstream atlas
 03_rea/          what REA is, which findings we used, evidence index + vendored evidence
 04_patterns/     Compose→SwiftUI tables, project shape, defect catalog, checklists
 05_tools/        scripts (recon, build, tests, visual audit, IPA, icon)
 06_evidence/     screenshots, the port's CHANGELOG / audit / verification docs,
                  recon baselines (Weather + Breezy)
 ```
+
+### The non-visual half (`01_method/11`–`17`)
+
+Added after auditing a second, much larger upstream (Breezy Weather 6.2.2: 1,358 Kotlin files,
+74 source integrations, 63 locales) and finding what a screenshot-driven port never touches:
+
+| Doc | Question it answers |
+|---|---|
+| `11_surface_map.md` | What does the manifest declare that no screen shows, and what is the iOS equivalent? |
+| `12_source_architecture.md` | How do you keep a provider seam when you ship one provider? |
+| `13_refresh_and_cache.md` | What is stale, for how long, and what does iOS actually guarantee in the background? |
+| `14_units_and_locale.md` | Which unit does a user in `en_GB` see before opening settings? |
+| `15_localization.md` | 1,162 strings in 63 languages: extraction, plurals, RTL, truncation. |
+| `16_data_completion.md` | What do you derive (dew point, feels-like, weather code) and what is "today"? |
+| `17_alerts_and_notifications.md` | Which alerts notify, whom, when, and how not to spam. |
+
+The measured inventory behind them is `02_case_study/UPSTREAM_ATLAS.md`; the consolidated
+checklist is `04_patterns/PORTING_CHECKLIST_V2.md`.
 
 ## Provenance
 

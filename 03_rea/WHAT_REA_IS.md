@@ -67,4 +67,4 @@ The conclusions were then written up as three analysis documents, also vendored:
 - Decompiled Compose code is genuinely hard to read — nested lambdas and positional calls. The
   method dumps answered the specific questions; nobody read them end-to-end.
 - If the APK is obfuscated, REA's answers are still useful but names stop meaning anything; keep a
-  mapping table (`01_method/02_source_recovery.md`, Situation C).
+  mapping table (`../01_method/02_source_recovery.md`, Situation C).

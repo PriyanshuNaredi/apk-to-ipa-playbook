@@ -55,7 +55,7 @@ You can answer, without opening the APK again:
 
 If a row of the inventory cannot be cited, it is a **guess**: write it down as a guess and
 schedule a test for it. In this port the guess was "the map probably re-renders tiles on
-return"; it was wrong, and the mistake cost a day (see `02_case_study/DEFECTS.md`, D9).
+return"; it was wrong, and the mistake cost a day (see `../02_case_study/DEFECTS.md`, D9).
 
 ## Automation
 

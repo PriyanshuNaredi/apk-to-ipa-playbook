@@ -26,7 +26,7 @@ position. Adding or removing a city could recycle the wrong page's state, or des
 the header. Now `ForEach(cities, id: \.id)` with `scrollPosition(id:)`, mirroring the Android
 structure.
 
-**Where**: `02_case_study/DEFECTS.md` (identity class), `04_patterns/COMPOSE_TO_SWIFTUI.md`
+**Where**: `../02_case_study/DEFECTS.md` (identity class), `../04_patterns/COMPOSE_TO_SWIFTUI.md`
 (pager row).
 
 ## 3. The bottom bar is a layout sibling, never an overlay
@@ -39,8 +39,8 @@ replaces the whole branch.
 touches (a map preview could swallow bar taps). Rebuilt as a sibling `VStack` element, exactly as
 Compose nests it. This is the single most valuable finding in the whole analysis.
 
-**Where**: `02_case_study/PARITY_LEDGER.md` (not a deviation — a restoration),
-`04_patterns/DEFECT_CATALOG.md` entry #3.
+**Where**: `../02_case_study/PARITY_LEDGER.md` (not a deviation — a restoration),
+`../04_patterns/DEFECT_CATALOG.md` entry #3.
 
 ## 4. Which scroll containers exist, per screen
 
@@ -52,7 +52,7 @@ drags.
 **Changed**: stopped nesting a third scroller around the forecast column. Gesture routing on iOS
 had one layer more than Android and produced dead zones; the port now matches the container count.
 
-**Where**: `01_method/06_ui_port.md` trap #5; map/forecast gesture tests.
+**Where**: `../01_method/06_ui_port.md` trap #5; map/forecast gesture tests.
 
 ## 5. Refresh policy is cache-first with a 900 s window, then a 15-minute loop
 
@@ -62,7 +62,7 @@ had one layer more than Android and produced dead zones; the port now matches th
 **Changed**: ported as a `.task`-based loop with explicit cancellation (the first version leaked
 and was replaced — see D17 in the defect log for the same class of bug).
 
-**Where**: data-layer logic tests; `01_method/05_data_layer.md`.
+**Where**: data-layer logic tests; `../01_method/05_data_layer.md`.
 
 ## 6. Back handling order: detail → screen → system
 

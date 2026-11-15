@@ -40,7 +40,7 @@ Proceed only with a written risk note. You will:
   fails" tests, because you are guessing.
 
 If the app also stores opaque blobs or talks to a server you do not control, stop and reconsider
-(`00_overview/WHY_PORT.md`).
+(`../00_overview/WHY_PORT.md`).
 
 ## Verify the artifact before trusting it
 
@@ -62,8 +62,8 @@ If the app also stores opaque blobs or talks to a server you do not control, sto
 - Resource evidence: apktool dump for the manifest and the launcher icon vector, which later
   became the iOS app icon (rendered, not redrawn).
 
-See `03_rea/FINDINGS_USED.md` for the specific findings that changed the port, and
-`03_rea/EVIDENCE_INDEX.md` for the full file inventory.
+See `../03_rea/FINDINGS_USED.md` for the specific findings that changed the port, and
+`../03_rea/EVIDENCE_INDEX.md` for the full file inventory.
 
 ## The gate
 

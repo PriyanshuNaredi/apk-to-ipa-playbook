@@ -39,7 +39,7 @@ opening the screen. Decide, document, test (`testRadarPlaysOnceFromTheStartWhenM
 **Label placement needs measured chrome.** Badges drawn at grid points get sliced by screen edges
 and buried under translucent panels. Fixed insets do not survive text-size and locale changes:
 measure the chrome (`PreferenceKey` + `GeometryReader`), exclude those rects, and greedily space
-badges so they never crowd (`04_patterns/DEFECT_CATALOG.md` D13).
+badges so they never crowd (`../04_patterns/DEFECT_CATALOG.md` D13).
 
 **Full-bleed beats a clipped box.** A capped sampling box made the colour field a rectangle over a
 quarter of the screen, which reads as a half-drawn overlay. Sample the whole viewport; thin the

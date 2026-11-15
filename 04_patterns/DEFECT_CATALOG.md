@@ -485,6 +485,100 @@ script that watches another tool, ask which line means "the tool said yes", and 
 
 ---
 
+## 31. One provider, hardcoded — and no seam where the second one goes
+
+**Symptom:** the port works, and three unrelated things are subtly wrong: a coverage gate looks
+arbitrary ("why does pollen vanish in New York?"), one failed request blanks a whole card, and there
+is no way to try a second API without editing the client.
+
+**Cause:** the first provider was wired directly (`OpenMeteoClient` called from the store) instead of
+behind a `WeatherProvider` protocol with `supportedFeatures`, `isSupported(at:)` and `priority`.
+Every per-feature rule then has to be invented ad hoc at the call site.
+
+**Fix:** a protocol with one implementation. ~80 lines. See `../01_method/12_source_architecture.md`.
+
+**Write these tests first:** resolver picks the highest-priority provider; resolver returns `nil`
+when nothing covers the feature — the second test is the one whose absence turns "not covered"
+into "0".
+
+**Rule:** a hardcoded provider is a scope decision; a hardcoded *call site* is a future refactor.
+
+---
+
+## 32. One timestamp for six features
+
+**Symptom:** "updated 2 min ago" while air quality is an hour old; or pollen refetched every time you
+open a card; or the whole screen reloads because the nowcast expired.
+
+**Cause:** the store remembers one `lastUpdated` for the whole weather object. Upstream has six
+(forecast, current, air quality, pollen, minutely, alerts) and a validity table that even depends on
+whether the payload has content.
+
+**Fix:** per-feature `Fetched<Value>` wrappers plus a `CachePolicy` value; stale-per-feature, 5 km
+coordinate invalidation.
+
+**Write this test:** two minutes later, same place → no network call; six minutes later → one call;
+moved 6 km one minute later → one call.
+
+---
+
+## 33. Defaults hardcoded to the developer's locale
+
+**Symptom:** `en_US` users see `22°C` and `21 km/h` until they open settings. Nobody on the team
+notices: the simulator is metric.
+
+**Cause:** `var temperatureUnit = .celsius` instead of a default derived from `Locale`.
+
+**Fix:** derive all five families from `Locale.current` (`temperatureUnit`, `measurementSystem`,
+`region`), including the hand-written country lists upstream keeps for wind speed and pressure.
+
+**Write this test:** the eight-locale loop in `../01_method/14_units_and_locale.md` §4. It fails on the
+first run and takes two minutes to fix.
+
+---
+
+## 34. Plurals made with string concatenation
+
+**Symptom:** "1 updates failed", or correct English and broken Polish.
+
+**Cause:** `"\(n) update\(n == 1 ? "" : "s") failed"`.
+
+**Fix:** plural variants in the String Catalog; English needs two forms, Polish four, Arabic six.
+
+**Write this test:** none — **grep** for `? "" : "s"` and `\(count) \(` in view code.
+
+---
+
+## 35. `daily[0]` is "today"
+
+**Symptom:** between local midnight and the first refresh, the header shows yesterday's high; the
+"today" detail page opens on yesterday; the date selector highlights the wrong row.
+
+**Cause:** daily entries are dated at local midnight, and the first row may be yesterday. Upstream's
+rule is *the first entry newer than 24 h ago*.
+
+**Fix:** a computed `todayIndex` in the model with the 24 h rule, used by every view.
+
+**Write this test:** entries `[2024-05-01T00:00Z, 2024-05-02T00:00Z]`, now `2024-05-02T00:10Z`,
+expect `todayIndex == 1`.
+
+---
+
+## 36. Porting the document instead of the code
+
+**Symptom:** the port disagrees with the app on one boundary — e.g. the day/night split is 06:00 in
+the port and 05:00 in the shipped app.
+
+**Cause:** the upstream manual (`breezy-weather/docs/HOMEPAGE.md`) and the upstream code
+(`PrecipitationViewHolder.onBindView`) disagree by an hour, and the manual was read first.
+
+**Fix:** the code wins, every time. Record the disagreement in the parity ledger so the next reader
+can see it was a decision, not an oversight.
+
+**Rule:** documentation describes intent at some past commit; the APK describes behaviour.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash
@@ -493,5 +587,9 @@ grep -rn "init(" Sources | xargs grep -l "onChange\|onWeather"   # 1
 grep -rn "while true\|withTaskGroup" Sources            # 4
 grep -rn "ZStack" Sources | wc -l                        # 3 (each is a hit-testing suspect)
 grep -rn "as? String" Sources                            # 8
+grep -rn '= \.celsius\|= \.kilometrePerHour\|= \.hectopascal' Sources   # 33 (want 0 in defaults)
+grep -rn '? "" : "s"' Sources                           # 34
+grep -rn 'daily\[0\]\|hourly\[0\]' Sources              # 35
+grep -rn 'struct .*: WeatherProvider' Sources           # 31 (want >= 1)
 ps aux | grep "[W]eatheriOS.app/WeatheriOS" | awk '{print $3}'   # 1
 ```

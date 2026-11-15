@@ -21,7 +21,7 @@ transcription of the source, which is stage 2's job. The useful unit is **one us
 behaviour**: a layout relationship, a timing, a persistence rule, a piece of copy.
 
 In this port 40-odd rows were enough for 5 screens; the survivors are in
-`02_case_study/PARITY_LEDGER.md` (that file lists only the ones that ended up *different*, which
+`../02_case_study/PARITY_LEDGER.md` (that file lists only the ones that ended up *different*, which
 is the interesting half).
 
 ## The four classes of row
@@ -41,7 +41,7 @@ is the interesting half).
 Some rows you *will* break — a platform API is missing, the original behaviour is a bug, or the
 port can do better. That is fine, under two conditions:
 
-1. The deviation is written down with the reason (`02_case_study/PARITY_LEDGER.md`).
+1. The deviation is written down with the reason (`../02_case_study/PARITY_LEDGER.md`).
 2. The gate for that row changes from "matches Android" to "matches the documented intent", and
    the test asserts the *new* behaviour.
 
@@ -63,4 +63,4 @@ The worst outcome is neither faithful nor documented: it looks like a defect and
 ## Exit gate
 
 Every row has a test or a named screenshot. Anything else moves to a "known gaps" list that
-`02_case_study/PARITY_LEDGER.md` and the README both link to.
+`../02_case_study/PARITY_LEDGER.md` and the README both link to.
