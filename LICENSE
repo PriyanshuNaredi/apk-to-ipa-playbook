@@ -1,0 +1,33 @@
+MIT License
+
+Copyright (c) 2026 Priyanshu Naredi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+This repository analyses and documents "Weather for Android" by Kian Konrad
+(https://github.com/Kian-hdr/Weather), which is MIT licensed and remains the
+copyright of its author. No application binaries, and no redistributable copy
+of that application, are included here; the material is analysis, method and
+the porting scripts written for this work.
+
+Evidence files under 03_rea/evidence/ are verbatim outputs of tooling run
+against that APK (rea-agents, jadx, apktool) and describe its contents; they
+are included for reproducibility of the analysis.
