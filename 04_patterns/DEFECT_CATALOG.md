@@ -908,6 +908,46 @@ a bug, and the next reader needs to know why.
 
 ---
 
+## 49. The blocks that are not cards
+
+**Symptom:** content sits at the top of a square block and the number is off centre — most
+obviously in a circular block, where "off centre" shouts. It survives code review because
+each block looks reasonable on its own; it is the *column* that looks wrong.
+
+**Cause:** the port reused the full-width card's padding for half-size blocks. Upstream does
+not use padding there at all: every square container is a `1:1` cell bounded by four
+guidelines — `block_top_guideline` 0.2, `block_bottom_guideline` 0.8, `block_start_guideline`
+0.2, `block_end_guideline` 0.8 — with the title on the top guide, the number filling the
+middle, and the label's baseline on the bottom guide. Circular blocks (`Corner.Full`) centre
+the title row as a packed chain; rounded ones leave it at the start guide.
+
+**Fix:** implement the guides once and use them for every square block:
+
+```swift
+GeometryReader { geo in
+    VStack(alignment: centred ? .center : .leading, spacing: 0) {
+        title; Spacer(minLength: 0); value; Spacer(minLength: 0); footer
+    }
+    .padding(.horizontal, geo.size.width * 0.2)
+    .padding(.vertical,   geo.size.height * 0.2)
+}
+```
+
+Percentages, not points: a guideline scales with the cell, a padding does not.
+
+**Do not** let the full-width card and the square block share one container view. Their
+geometry rules are different, and the shared view will satisfy the louder one.
+
+**Also check the block's *contents*, not just its alignment:** ours drew a 360 ° air-quality
+ring plus a PM2.5/PM10 column that upstream only shows on the details screen, where the
+block is an `ArcProgress` with `app:arc_angle="270"`, `app:max="400"` and a 5 dp margin.
+"Looks fine" and "matches the original" are different tests.
+
+**Write this test:** screenshot the tricky block *alone*, cropped to the card, and look at
+it — a percentage guide error is invisible in a full-screen screenshot.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash

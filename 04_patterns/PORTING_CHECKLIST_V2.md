@@ -81,6 +81,8 @@ screenshot is not a tick.
       defect §43
 - [ ] Frame rate measured, not assumed; a setting exists to pause the animation — defect §43
 - [ ] The test gate counts every framework in the output and prints the split — defect §44
+- [ ] Square blocks use the upstream's 20 %/80 % guidelines, not a padding, and full-width
+      cards have their own container — defect §49
 - [ ] Every card's *appearance* field and *numbers* field written down, and the copy for
       the state where they disagree — defect §48
 - [ ] Every period/period-boundary constant in the upstream is listed with the file it
