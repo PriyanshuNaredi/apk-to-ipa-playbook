@@ -65,6 +65,18 @@ running anything.
 three two-column rows, with rows of unequal height because one card has a second line. That ragged
 height is what the Android grid does too; a SwiftUI `LazyVGrid` would stretch them level and lose it.
 
+`screenshots/gust-header-backdrop.png` is the parity header: the screen itself is painted
+in upstream's weather colour for the current conditions and daylight, with the relative
+update time, condition, value and unit, feels-like and day/night range on top of it. The
+colour table is ported literal-for-literal; the animated artwork is not.
+
+`screenshots/gust-settings-groups.png` is upstream's settings structure — one card per
+group with an icon, a title and a one-line summary — restricted to the groups iOS can
+honour.
+
+`screenshots/gust-detail-days.png` is a detail page with its date selector (selected day
+underlined), the Daytime/Nighttime pair and the category menu.
+
 `screenshots/gust-detail-hourly.png` is a detail page: a temperature line over precipitation-probability
 bars, drawn with Canvas, with a reserved left gutter for the extreme labels. The first build had those
 labels under the line — correct code, unreadable result.
