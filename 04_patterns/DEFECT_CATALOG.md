@@ -406,6 +406,24 @@ tree: assert what a human would see, using the tool that can see.
 
 ---
 
+## 26. Empty is three different facts
+
+**Symptom:** the pollen card showed "0" for a city in the United States. The number was not wrong so
+much as meaningless: there is no pollen product there.
+
+**Cause:** a coverage-gated API. Upstream gates the request on a bounding box; porting the request
+without the gate requests variables the service cannot answer, gets empty arrays, and renders them as
+"zero".
+
+**Rule:** for every piece of data, distinguish **absent** (no value), **zero** (a measured zero) and
+**not covered** (this product does not exist here). They need different words on screen, because a
+user acts on them differently. Model it as `hasData` vs `value`, not as a single number.
+
+**Checklist item:** whenever a source documents a coverage area, a resolution, or a "not available
+for this region" note, that note belongs in the port as a gate and as UI copy.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash
