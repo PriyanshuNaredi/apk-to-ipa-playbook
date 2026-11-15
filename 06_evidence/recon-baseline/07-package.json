@@ -1,0 +1,21 @@
+{
+  "app_package": "dev.kiankonrad.weather",
+  "app_java_files": 43,
+  "app_loc": 18450,
+  "library_java_files": 19228,
+  "total_java_files": 19271,
+  "top_library_packages": [
+    {"package": "sources/androidx/compose/material/icons/twotone", "files": 2132},
+    {"package": "sources/androidx/compose/material/icons/sharp", "files": 2132},
+    {"package": "sources/androidx/compose/material/icons/rounded", "files": 2132},
+    {"package": "sources/androidx/compose/material/icons/outlined", "files": 2132},
+    {"package": "sources/androidx/compose/material/icons/filled", "files": 2132},
+    {"package": "sources/androidx/compose/material3", "files": 530},
+    {"package": "sources/androidx/compose/runtime", "files": 219},
+    {"package": "sources/androidx/compose/foundation/layout", "files": 211},
+    {"package": "sources/androidx/compose/p000ui/platform", "files": 159},
+    {"package": "sources/androidx/compose/foundation/gestures", "files": 149},
+    {"package": "sources/androidx/compose/foundation", "files": 148},
+    {"package": "sources/kotlinx/coroutines/flow", "files": 147}
+  ]
+}

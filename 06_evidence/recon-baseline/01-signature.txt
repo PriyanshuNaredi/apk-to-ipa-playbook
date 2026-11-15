@@ -1,0 +1,14 @@
+v1 (JAR) signature: no
+APK Signing Block: present (8184 bytes)
+  scheme v2: 1961 bytes
+  scheme 0x504b4453: 6025 bytes
+  scheme 0x42726577: 150 bytes
+
+--- signing certificate ---
+subject=C=DE, O=Personal, CN=Weather Personal
+issuer=C=DE, O=Personal, CN=Weather Personal
+notBefore=Oct 16 19:42:28 2026 GMT
+notAfter=Mar  3 19:42:28 2054 GMT
+sha256 Fingerprint=D3:37:0A:79:78:AB:64:64:0B:64:AF:5B:E1:CE:CA:60:7E:EB:C6:83:CB:0C:3D:47:DD:02:DD:0E:7E:23:F5:C3
+
+Note: CN=Android Debug means the build was not signed by the original publisher -- verify provenance before porting.

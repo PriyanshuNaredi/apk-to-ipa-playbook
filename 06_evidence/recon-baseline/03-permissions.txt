@@ -1,0 +1,7 @@
+# Permissions, with the likely iOS counterpart
+android.permission.INTERNET                    -> none (always allowed)
+android.permission.ACCESS_COARSE_LOCATION      -> CoreLocation whenInUse + NSLocationWhenInUseUsageDescription
+android.permission.ACCESS_FINE_LOCATION        -> CoreLocation whenInUse + NSLocationWhenInUseUsageDescription
+android.permission.ACCESS_NETWORK_STATE        -> NWPathMonitor
+android.permission.ACCESS_WIFI_STATE           -> UNKNOWN - decide at stage 3
+dev.kiankonrad.weather.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION -> UNKNOWN - decide at stage 3

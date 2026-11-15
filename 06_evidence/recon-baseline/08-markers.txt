@@ -1,0 +1,27 @@
+# framework
+Compose (androidx.compose.*) - declarative
+No app-owned fragments (library hits ignored)
+No DI framework in app classes
+
+# structural markers in app classes (files containing each)
+LazyColumn             1
+verticalScroll         2
+horizontalScroll       1
+HorizontalPager        1
+SharedPreferences      1
+Canvas                 2
+AndroidView            1
+MapView                1
+OkHttp                 2
+AtomicFile             1
+
+# entry points (app classes with onCreate)
+sources/dev/kiankonrad/weather/MapsKt.java
+sources/dev/kiankonrad/weather/MainActivity.java
+
+# obfuscation signal (app classes with 1-2 char names)
+short-named app files: 0 of 43
+
+# size
+app:     43 java files, 18450 lines
+bundled: 19228 classes of libraries (not ported, just dependencies)

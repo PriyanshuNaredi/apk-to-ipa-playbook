@@ -1,0 +1,10 @@
+# Components
+activity   dev.kiankonrad.weather.MainActivity
+receiver   androidx.profileinstaller.ProfileInstallReceiver
+provider   androidx.startup.InitializationProvider
+
+# Launcher
+single LAUNCHER activity expected
+
+# Activity count (a port with 1 activity has no navigation graph to port)
+1

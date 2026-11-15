@@ -57,6 +57,23 @@ If a row of the inventory cannot be cited, it is a **guess**: write it down as a
 schedule a test for it. In this port the guess was "the map probably re-renders tiles on
 return"; it was wrong, and the mistake cost a day (see `02_case_study/DEFECTS.md`, D9).
 
+## Automation
+
+When there is no repository to read, `05_tools/apk-recon.sh` produces this whole stage in one run:
+checksum pin, signing certificate, decoded manifest, permissions mapped to their iOS counterparts,
+components, user-visible copy, colours/dimens/icon vectors, app-vs-library class counts, and the
+architecture markers (Compose or Views, scroll containers per screen, pager, map, network, DI,
+obfuscation). Commit its output as the new port's `recon/` evidence directory; the script was
+validated against an APK whose answers were already known — see `06_evidence/recon-baseline/`.
+
+Two of its outputs decide scope before any design work:
+
+- **Permissions with `UNKNOWN` counterpart** (foreground services, boot receivers, wake locks,
+  cross-app queries). Each is a feature that cannot exist on iOS as written. Decide with the owner,
+  do not discover it at stage 6.
+- **App classes vs bundled library classes.** The first version of the script counted both and
+  reported 19,271 classes; the app was 43. Size the work from the app's own package only.
+
 ## Anti-patterns
 
 - Designing the iOS architecture during recon. You will port your design, not the app.

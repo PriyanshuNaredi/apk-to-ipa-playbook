@@ -63,6 +63,20 @@ rewrite.
 4. `04_patterns/CHECKLISTS.md` — the gates as tickable lists.
 5. `05_tools/` — copy-paste scripts: build, test, visual audit, unsigned IPA, icon rendering.
 
+### Starting from an APK with no source
+
+```bash
+./05_tools/setup-apk-tools.sh          # Temurin JDK + jadx + apktool, no sudo, ~2 min
+./05_tools/apk-recon.sh app.apk ./app-recon
+less ./app-recon/RECON.md              # then the gates it lists
+```
+
+Ten evidence files in one run: checksum pin, signing certificate, manifest, permissions mapped to
+their iOS counterparts, components, user-visible copy, colours/dimens/icon vectors, app-vs-library
+class counts, and architecture markers (Compose or Views, scroll containers per screen, pager, map,
+network, DI, obfuscation). Validated against the Weather APK, whose answers were already known —
+output committed at `06_evidence/recon-baseline/`.
+
 ## Repo map
 
 ```
@@ -71,8 +85,8 @@ rewrite.
 02_case_study/   timeline, defects, parity ledger, metrics
 03_rea/          what REA is, which findings we used, evidence index + vendored evidence
 04_patterns/     Compose→SwiftUI tables, defect catalog, checklists
-05_tools/        scripts (build, tests, visual audit, IPA, icon)
-06_evidence/     screenshots, session logs, the port's CHANGELOG / audit / verification docs
+05_tools/        scripts (recon, build, tests, visual audit, IPA, icon)
+06_evidence/     screenshots, the port's CHANGELOG / audit / verification docs, recon baseline
 ```
 
 ## Provenance
