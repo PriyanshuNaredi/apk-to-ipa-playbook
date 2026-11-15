@@ -1,17 +1,32 @@
 # APK → IPA Playbook
 
 How to take an Android app you have the source (or only the APK) for, and rebuild it as a
-native iOS app that a user cannot tell apart — plus the full record of doing it once,
+native iOS app that a user cannot tell apart — plus the full record of doing it **twice**,
 defects and all.
 
-This repo is the **method** and the **evidence** from porting
-[Weather for Android](https://github.com/Kian-hdr/Weather) (Kotlin, Jetpack Compose,
-MapLibre GL, MIT, v1.1.1) to a SwiftUI iOS app in two days: 2,144 lines of Kotlin became
-6,079 lines of Swift across 30 files, with 87 logic tests and 11 UI tests standing watch.
+This is not a single successful port written up afterwards. The method was applied to one
+small app, tightened, and then applied again to an upstream **about sixty times larger and
+under a different licence** — and the second run is what added half of what is here. Both
+ports are real and both are public; the second one builds its unsigned IPA in CI on every
+push:
 
-It exists because the second port should not repeat the first one's cost. Read the playbook
-top to bottom before touching an APK; read the case study when the playbook says "this
-happens" and you want to know how it actually looked.
+| | Port 1 | Port 2 |
+|---|---|---|
+| Upstream | [Weather for Android](https://github.com/Kian-hdr/Weather) — Kotlin, Jetpack Compose, MapLibre GL, MIT, v1.1.1 | [Breezy Weather](https://github.com/breezy-weather/breezy-weather) — Kotlin, Compose, 6 Gradle modules, LGPL-3.0, v6.2.2 |
+| Upstream size | 2,144 lines Kotlin | 1,358 Kotlin files, ~136,700 lines, 6 modules |
+| Port | [weather-ios-port](https://github.com/PriyanshuNaredi/weather-ios-port) | **[Gust](https://github.com/PriyanshuNaredi/gust)** — public, with a [downloadable unsigned IPA](https://github.com/PriyanshuNaredi/gust/releases/tag/v0.2.0) |
+| Swift written | 6,079 lines across 30 files | 8,157 lines across 61 files |
+| Tests | 87 logic + 11 UI | 99 logic + 10 UI |
+| Defects it produced | 22 (`02_case_study/DEFECTS.md`) | 12 more catalogued (§31–§42), after the audit of the upstream |
+| What the port taught the method | the visual audit, the CPU metric, the parity ledger, the defect catalog | the non-visual half (`01_method/11`–`17`), the surface map, the look-in-the-resources rule (§37–§42) |
+
+The first port made the playbook possible. The second port is why it is worth reading: the
+things it got wrong on a 1,358-file upstream — providers, cache validity, locale defaults,
+card shapes, artwork lookups — are the things no screenshot review catches, and they are now
+written down before you hit them.
+
+Read the playbook top to bottom before touching an APK; read the case study when the playbook
+says "this happens" and you want to know how it actually looked.
 
 ---
 
@@ -20,7 +35,7 @@ happens" and you want to know how it actually looked.
 | Layer | Directory | What it gives you |
 |---|---|---|
 | **Playbook** (reusable) | `01_method/`, `04_patterns/` | 10 stages plus 7 non-visual subsystem docs, entry/exit gates, Compose→SwiftUI mapping tables, 42 catalogued defects, checklists |
-| **Case study** (this app + the second, larger upstream) | `02_case_study/`, `03_rea/`, `06_evidence/` | commit-by-commit timeline, defects with root cause and proof, parity ledger, a measured atlas of Breezy Weather 6.2.2, REA findings we acted on, screenshots and logs |
+| **Case study** | `02_case_study/`, `03_rea/`, `06_evidence/` | commit-by-commit timeline, defects with root cause and proof, parity ledger, a measured atlas of [Breezy Weather 6.2.2](https://github.com/breezy-weather/breezy-weather), REA findings we acted on, screenshots and logs |
 
 ## The 10 stages
 
@@ -40,7 +55,7 @@ rewrite.
 | 9 | Release | Unsigned IPA builds reproducibly in CI and is verified unsigned |
 | 10 | Retrospective | The defect catalog is updated with what actually bit you |
 
-## Results at a glance (this case)
+## Results at a glance: port 1 (Weather for Android)
 
 | Metric | Value |
 |---|---|
@@ -53,6 +68,22 @@ rewrite.
 | Release artifact | 1.2 MB unsigned IPA, `arm64`, no `LC_CODE_SIGNATURE` |
 | Defects found and fixed | 22 (see `02_case_study/DEFECTS.md`) — 12 would have shipped silently |
 | Deliberate deviations from the APK | 9, each documented (see `02_case_study/PARITY_LEDGER.md`) |
+
+## Results at a glance: port 2 (Breezy Weather 6.2.2 → Gust)
+
+Measured on the public port at tag `v0.2.0`, not estimated:
+
+| Metric | Value |
+|---|---|
+| Upstream surveyed | 1,358 Kotlin files / ~136,700 lines across `app`, `data`, `domain`, `maps-utils`, `ui-weather-view`, `weather-unit`; 74 source classes (9 worldwide + 59 national weather services, plus location and geocoding); 63 locales; 1,162 strings; SQLDelight with 25 migrations |
+| Swift written | 8,157 lines across 61 files (3,311 in the app target, 3,099 in the portable units package, 1,722 in tests) |
+| Logic tests | 99, 0.06 s |
+| Simulator UI tests | 10, ~4 min |
+| CI | `.github/workflows/unsigned-ipa.yml` on `macos-15`: package tests, XcodeGen, unsigned IPA, artifact — green on the first run, and it fails if zero tests execute |
+| Release artifact | 1.79 MB unsigned IPA attached to `v0.2.0`, installable with SideStore or LiveContainer |
+| Visual parity | card shapes taken from `app:shapeAppearance` (8 `ExtraLarge`, 4 `Full`), 85 upstream weather drawables resolved by a ported lookup, 67 dp trend columns, no tab bar — the original has none |
+| What the method was missing before this port | 7 subsystem documents (`11`–`17`), a measured upstream atlas, and 12 defect entries |
+| Licence outcome | LGPL-3.0 with upstream's `LICENSE_ADDITIONAL`: renamed, new icon, notices in the app and at the repo root — see `00_overview/LICENCES.md` |
 
 ## How to use this repo on the next port
 
@@ -115,15 +146,32 @@ checklist is `04_patterns/PORTING_CHECKLIST_V2.md`.
 
 ## Provenance
 
-Every claim here is traceable to the port repository's commits, its `CHANGELOG.md`,
-`CODE_AUDIT.md` and `MACOS_VERIFICATION.md` (all copied into `06_evidence/`), or to a file
-under `03_rea/evidence/`. Where something was **not** verified — physical-device install,
-on-device performance, denied-permission paths — it is labelled as such rather than implied.
+Every claim here is traceable to a public commit. For port 1, that is
+[weather-ios-port](https://github.com/PriyanshuNaredi/weather-ios-port) and its
+`CHANGELOG.md`, `CODE_AUDIT.md`, `MACOS_VERIFICATION.md` (all copied into `06_evidence/`).
+For port 2, it is [Gust](https://github.com/PriyanshuNaredi/gust) — the commits named
+throughout this repo, the [CI run that built its IPA](https://github.com/PriyanshuNaredi/gust/actions/runs/43729204363),
+and the [release that ships it](https://github.com/PriyanshuNaredi/gust/releases/tag/v0.2.0) —
+or a file under `03_rea/evidence/`. Upstream numbers in `02_case_study/UPSTREAM_ATLAS.md`
+carry the command that produced them.
 
-Port: **Priyanshu Naredi**. Original Android app: **Kian Konrad**
+Where something was **not** verified — physical-device install, on-device performance,
+denied-permission paths, the appearance of the generated icon — it is labelled as such rather
+than implied.
+
+Ports: **Priyanshu Naredi** —
+[weather-ios-port](https://github.com/PriyanshuNaredi/weather-ios-port),
+[gust](https://github.com/PriyanshuNaredi/gust).
+
+Original Android apps: **Kian Konrad**
 ([Kian-hdr/Weather](https://github.com/Kian-hdr/Weather), MIT) — the artwork, wording, colour
-stops and cache budgets this port copies are his. Analysis of MIT-licensed source only: no
-binaries are redistributed here.
+stops and cache budgets port 1 copies are his; and **the Breezy Weather contributors**
+([breezy-weather/breezy-weather](https://github.com/breezy-weather/breezy-weather), LGPL-3.0,
+v6.2.2) — port 2 is a derivative of their work, ships their artwork under their licence, and
+is named and branded as a separate app because their `LICENSE_ADDITIONAL` requires it.
+
+This repository redistributes neither app's binaries nor their artwork: it holds text,
+scripts, and screenshots produced by the ports themselves.
 
 ## Licence
 

@@ -1,7 +1,9 @@
 # Evidence manifest — what is in `06_evidence/`, and where it came from
 
 Everything here is copied verbatim from the port repository
-(`PriyanshuNaredi/weather-ios-port`, HEAD `5acc2eb` at copy time). Nothing was edited; each file
+(`PriyanshuNaredi/weather-ios-port`, HEAD `5acc2eb` at copy time). Port 2's evidence is
+public in [`PriyanshuNaredi/gust`](https://github.com/PriyanshuNaredi/gust) rather than copied
+here. Nothing was edited; each file
 was produced by the port's own scripts or by me while doing the work.
 
 ## Screenshots (`screenshots/`)

@@ -1,7 +1,8 @@
 # Upstream atlas — what Breezy Weather 6.2.2 actually contains
 
-Measured from `breezy-weather/breezy-weather` at tag `v6.2.2`, the same tree the port was
-built against. Every number here was produced by a command, not from memory; the commands
+Measured from [`breezy-weather/breezy-weather`](https://github.com/breezy-weather/breezy-weather)
+at tag `v6.2.2`, the same tree the port — [Gust](https://github.com/PriyanshuNaredi/gust) —
+was built against. Every number here was produced by a command, not from memory; the commands
 are in the last section so the numbers can be re-derived on another tag.
 
 This document exists because the first pass over the repository was driven by the *screens*

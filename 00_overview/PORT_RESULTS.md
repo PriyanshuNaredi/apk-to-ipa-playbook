@@ -62,10 +62,12 @@ that file's "caught by" column.
 
 ## Second pass: the audit of a larger upstream
 
-A second port used a much bigger upstream — Breezy Weather 6.2.2, 1,358 Kotlin files across
-6 Gradle modules, 74 weather-source integrations, 63 locales — and the first thing it produced
-was a list of everything the *first* pass never looked at. Measured inventory:
-`../02_case_study/UPSTREAM_ATLAS.md`.
+A second port used a much bigger upstream —
+[Breezy Weather 6.2.2](https://github.com/breezy-weather/breezy-weather), 1,358 Kotlin files
+across 6 Gradle modules, 74 weather-source integrations, 63 locales — and the first thing it
+produced was a list of everything the *first* pass never looked at. The port itself is public:
+[PriyanshuNaredi/gust](https://github.com/PriyanshuNaredi/gust), `v0.2.0`, with an unsigned IPA
+attached to its release. Measured inventory: `../02_case_study/UPSTREAM_ATLAS.md`.
 
 | What was missing from the method | Where it now lives | Evidence it mattered |
 |---|---|---|

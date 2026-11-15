@@ -3,6 +3,7 @@
 The port ran in two sittings (Linux CI bring-up, then macOS/Xcode bring-up) plus three
 parity/behaviour passes. Each entry: what broke, what fixed it, what proves it now.
 Commits referenced from the port repository (`PriyanshuNaredi/weather-ios-port`).
+Port 2's commits are in [`PriyanshuNaredi/gust`](https://github.com/PriyanshuNaredi/gust).
 
 ## Sitting 1 — scaffolding on Linux (pre-macOS)
 
