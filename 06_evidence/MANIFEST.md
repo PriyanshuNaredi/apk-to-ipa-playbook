@@ -65,6 +65,13 @@ running anything.
 three two-column rows, with rows of unequal height because one card has a second line. That ragged
 height is what the Android grid does too; a SwiftUI `LazyVGrid` would stretch them level and lose it.
 
+`screenshots/gust-detail-hourly.png` is a detail page: a temperature line over precipitation-probability
+bars, drawn with Canvas, with a reserved left gutter for the extreme labels. The first build had those
+labels under the line — correct code, unreadable result.
+
+`screenshots/gust-settings.png` is the settings screen: five display-unit pickers, all wired to live
+formatting rather than stored and ignored.
+
 `screenshots/gust-nowcast.png` shows the nowcast card: four short bars for a light drizzle on an
 absolute scale, with the window moved to begin at the first wet step ("from 09:15") because the rain
 was seven hours out. The bars are deliberately small — upstream scales to a fixed heavy threshold,

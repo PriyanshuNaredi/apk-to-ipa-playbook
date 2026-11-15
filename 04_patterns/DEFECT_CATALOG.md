@@ -371,6 +371,41 @@ data hides the one comparison the user cares about.
 
 ---
 
+## 24. Accessibility identifiers, again — this time from `NavigationLink`
+
+**Symptom:** wrapping cards in `NavigationLink` made every card identifier inside them vanish. Two
+tests that had passed for hours started failing with "card missing".
+
+**Cause:** same rule as defect 20, one level up. A link is a button, and a button is one
+accessibility element; identifiers inside it are no longer individually addressable.
+
+**Fix:** `.accessibilityElement(children: .contain)` on the link as well.
+
+**Also seen:** a container identifier on a list of rows merged them into a single identifier string
+(`daily.row.0-daily.row.0-daily.row.1-…`). If child identifiers are the useful handles, do not put an
+identifier on the parent at all.
+
+**Rule of thumb:** identifiers belong on leaf-ish views. Every container you name either eats or
+merges its descendants.
+
+---
+
+## 25. Code that is correct and a screen that is still wrong
+
+**Symptom:** the hourly detail chart drew correctly, and the min/max labels sat underneath the line.
+
+**Cause:** nothing in the code. Two text labels were placed at fixed coordinates that the data
+happened to occupy.
+
+**Fix:** reserve a gutter for the labels and draw the series inside the remainder.
+
+**Practice:** look at the rendered screen with a vision model after building any canvas or custom
+layout. Unit tests cannot see overlap, and "it compiles and the numbers are right" is not the same
+claim as "you can read it". This is the same lesson as defect 20's advice to dump the accessibility
+tree: assert what a human would see, using the tool that can see.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash
