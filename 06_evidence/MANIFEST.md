@@ -31,6 +31,20 @@ every surface and writes named captures. Taken on iPhone 16 / iOS 18.0 simulator
 | `CODE_AUDIT.md` | Port repo root | Repo-wide audit: 6 fixed findings + finding 7 (the icon never compiled) + the "not checked" list |
 | `MACOS_VERIFICATION.md` | `05_ios_port/` | The evidence table: every build/test/defect claim with the command or test that proves it |
 
+## Recon baseline (`recon-baseline/`)
+
+Output of `05_tools/apk-recon.sh` run against `Weather_v1.1.1.apk` (the release artifact, sha256
+verified against the recorded baseline). Kept because it is the only proof that the recon script
+reports the truth: the answers here were already established by hand in early 2026, so the script's
+agreement is a real check rather than a self-consistent-looking output.
+
+It rediscovered: Compose, no app-owned fragments, no DI, `HorizontalPager` ×1, `LazyColumn` ×1,
+`verticalScroll` ×2, `AndroidView` + `MapView` ×1, `OkHttp` ×2, `AtomicFile` ×1,
+`SharedPreferences` ×1, both entry points (`MainActivity`, `MapsKt`), package
+`dev.kiankonrad.weather` v1.1.1 (code 6), 43 app classes, and a self-signed
+`CN=Weather Personal` certificate. The decompiled tree (274 MB) and decoded resources (435 MB) are
+not vendored.
+
 ## Deliberately not vendored
 
 - **The APK** (~7 MB) and the decompiled sources tree (~60 MB): the analysed artifact is described
