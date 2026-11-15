@@ -14,7 +14,8 @@ push:
 |---|---|---|
 | Upstream | [Weather for Android](https://github.com/Kian-hdr/Weather) — Kotlin, Jetpack Compose, MapLibre GL, MIT, v1.1.1 | [Breezy Weather](https://github.com/breezy-weather/breezy-weather) — Kotlin, Compose, 6 Gradle modules, LGPL-3.0, v6.2.2 |
 | Upstream size | 2,144 lines Kotlin | 1,358 Kotlin files, ~136,700 lines, 6 modules |
-| Port | [weather-ios-port](https://github.com/PriyanshuNaredi/weather-ios-port) | **[Gust](https://github.com/PriyanshuNaredi/gust)** — public, with a [downloadable unsigned IPA](https://github.com/PriyanshuNaredi/gust/releases/tag/v0.2.0) |
+| Port | [weather-ios-port](https://github.com/PriyanshuNaredi/weather-ios-port) | **[Gust](https://github.com/PriyanshuNaredi/gust)** |
+| CI + IPA | [run green](https://github.com/PriyanshuNaredi/weather-ios-port/actions/runs/43656216367); IPA + sha256 on [v1.1.1-6](https://github.com/PriyanshuNaredi/weather-ios-port/releases/tag/v1.1.1-6) | [run green](https://github.com/PriyanshuNaredi/gust/actions/runs/43729204363); 1.79 MB IPA on [v0.2.0](https://github.com/PriyanshuNaredi/gust/releases/tag/v0.2.0) |
 | Swift written | 6,079 lines across 30 files | 8,157 lines across 61 files |
 | Tests | 87 logic + 11 UI | 99 logic + 10 UI |
 | Defects it produced | 22 (`02_case_study/DEFECTS.md`) | 12 more catalogued (§31–§42), after the audit of the upstream |
