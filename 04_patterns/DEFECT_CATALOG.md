@@ -251,6 +251,32 @@ separately (`05_tools/apk-recon.sh` does).
 
 ---
 
+## 18. A script that reports success after a failure
+
+**Symptom:** the build script prints `OK: built` and installs a **stale** app. No error anywhere.
+
+**Cause:** `xcodebuild ... | grep -E "error:|BUILD SUCCEEDED"` — the pipeline's exit status is
+grep's, so a failed build is invisible. Under `set -o pipefail` it would fail *the other way*
+(a successful build with a SIGPIPE'd grep looks failed). Both directions are wrong.
+
+**Fix:** capture the log, branch on the command's own status, then inspect the log:
+
+```bash
+BUILD_LOG=$(mktemp)
+if ! xcodebuild ... build > "$BUILD_LOG" 2>&1; then
+  grep -E "error:" "$BUILD_LOG" | head -20; echo "FAIL: build failed" >&2; exit 1
+fi
+grep -c "BUILD SUCCEEDED" "$BUILD_LOG" >/dev/null || { echo "FAIL: no success marker" >&2; exit 1; }
+```
+
+The general rule, now learned twice on two different ports: **never let a text filter decide
+whether a command succeeded.** Capture, check status, then filter for human reading.
+
+**Write this test:** break the build on purpose once (add `let x: Int = "s"`), run the script, and
+confirm it fails.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash

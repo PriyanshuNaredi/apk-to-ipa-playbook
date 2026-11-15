@@ -56,6 +56,11 @@ sources, plus live wallpaper and RemoteViews widgets. Kept because it is the wor
   into "cut 91 % of it and port the UI"
 - nine permissions have no iOS counterpart, stated as decisions rather than discovered later
 
+`screenshots/gust-live-openmeteo.png` is the stage-5 gate from that port: live data fetched by the
+ported client from Open-Meteo (Berlin: 1.6 °C, 10.0 km/h, 88 %, 1017.5 hPa), decoded by the ported
+response types and rendered through the ported units — committed so the claim is checkable without
+running anything.
+
 `screenshots/gust-shell-stage4.png` is the stage-4 gate from that port: the app target running on a
 simulator with no signing identity, showing values computed by the ported units package
 (humidex 31.0 °C at 25 °C / 18 °C dew point; wind chill correctly absent above 10 °C).
