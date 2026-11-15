@@ -277,6 +277,43 @@ confirm it fails.
 
 ---
 
+## 19. A "helpful" data transform that shifts a time series
+
+**Symptom:** everything looks right, but the rain nowcast is early. In this case
+the payload had 1,632 fifteen-minute steps and the port rendered 1,613.
+
+**Cause:** `values.compactMap { $0 }` to drop nulls. The array is a **time series**:
+dropping a gap moves every later value to an earlier timestamp. Upstream keeps one
+entry per step with a nullable value, exactly so gaps stay gaps.
+
+**Rule:** for a time series, never filter, compact, dedupe or sort. Keep alignment
+with the time axis and make the value optional. (Sorting by value is the same bug
+in a different costume.)
+
+**Write this test:** assert the *count equals the timestamp count* and that the
+fixture contains at least one null — otherwise the test cannot catch the bug.
+
+---
+
+## 20. SwiftUI: a container identifier eats its children's identifiers
+
+**Symptom:** a UI test waits 30 s for `header.temperature` and fails, while the
+same build works by hand. Dumping `app.debugDescription` shows the temperature
+element carrying the *container's* identifier.
+
+**Cause:** `.accessibilityIdentifier("card.header")` on a `VStack` propagates down
+the subtree and overwrites descendants that set their own.
+
+**Fix:** declare the container first —
+`.accessibilityElement(children: .contain).accessibilityIdentifier("card.header")`.
+
+**Technique worth keeping:** when a UI query fails, print `app.debugDescription`
+from a throwaway test before changing any assertions. It found this in one run,
+where guessing had already cost two. Keep it in a file named to sort last
+(`ZZDebugTree.swift`) and delete it afterwards.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash
