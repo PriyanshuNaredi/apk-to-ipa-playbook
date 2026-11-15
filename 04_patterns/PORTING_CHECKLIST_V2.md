@@ -81,6 +81,8 @@ screenshot is not a tick.
       defect §43
 - [ ] Frame rate measured, not assumed; a setting exists to pause the animation — defect §43
 - [ ] The test gate counts every framework in the output and prints the split — defect §44
+- [ ] Every period/period-boundary constant in the upstream is listed with the file it
+      lives in; a card that splits the same data twice keeps both splits — defect §47
 - [ ] Every law applied to a fetched series is clipped or resampled to the rendered span
       first, in the data layer, with a test — defect §46
 - [ ] `permissions: contents: write` declared before the first tag, and the release asset's

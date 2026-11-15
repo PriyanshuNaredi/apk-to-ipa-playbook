@@ -829,6 +829,47 @@ is the topmost one; flip the anchor within ~14 pt of the top of the plot.
 
 ---
 
+## 47. One card, two clocks, and the port only read one of them
+
+**Symptom:** a block reads "—" or a number for the wrong period, but only for a couple of
+hours a day — so it passes every daytime screenshot comparison.
+
+**Cause:** the upstream card split the same data twice with different hours and never said
+so. `PrecipitationViewHolder` chose *which half of the day to describe* at **05:00 and
+17:00**; `CommonConverter.getHourlyListByHalfDay` chose *which hours are summed into that
+half* at **06:00 and 18:00** (it shifts every hour by six hours and calls anything before
+noon "day"). The port read the first pair of hours, applied it to both jobs, and resolved
+the night window forwards. At 03:00 it therefore summed 17:00→05:00 of the day that was
+just beginning, found no hours, and showed a dash — describing a night still to come
+instead of the one just gone.
+
+**Fix:** port every split you find, even when two of them disagree:
+
+```swift
+// which half is shown
+func period(hour: Int) -> Period { (5...16).contains(hour) ? .day : .night }
+// which hours are summed, and a night belongs to the evening it starts in
+func window(_ period: Period, at now: Date) -> (Date, Date) {
+    switch period {
+    case .day:   return (six(now), eighteen(now))
+    case .night:
+        let start = hour(now) < 6 ? previousEvening(now) : thisEvening(now)
+        return (start, start + 12.hours)
+    }
+}
+```
+
+**How to find it:** grep the upstream for **every** constant that looks like a boundary or a
+threshold and note which file each lives in. Two files with different numbers for the same
+concept is the signal. Also check whether the comparison is `==` or `>=`: upstream compared
+a part to its total with `==`, so a half whose rain and snow add up to *less* than its total
+stays generic, which `>=` silently changes.
+
+**Write this test:** a case at 03:00, a case at 05:30, a case at 17:30, and both window
+boundaries — the two disagreeing hours are exactly the ones a casual test misses.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash
