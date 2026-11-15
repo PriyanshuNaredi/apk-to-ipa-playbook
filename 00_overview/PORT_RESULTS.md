@@ -81,6 +81,22 @@ Six new defect entries were added as a result (§31–36), and the consolidated 
 `../04_patterns/PORTING_CHECKLIST_V2.md` — 80-odd ticks, half of which are not visible on any
 screen.
 
+### The second pass, continued: the appearance
+
+The same port then went back to the main screen, which had every card and looked wrong. Six further
+defects (§37–§42) came out of it, none of them in the data layer:
+
+| What was wrong | Where it now lives | Evidence it mattered |
+|---|---|---|
+| Card shapes invented (`Corner.Full` ×4, `Corner.ExtraLarge` ×8 across 12 of 15 containers; 3 with none) | `../04_patterns/DEFECT_CATALOG.md` §37, `../01_method/06_ui_port.md` | One radius everywhere made the circular blocks rectangular |
+| Platform symbol set substituted for 85 upstream PNGs resolving 83 conditions | §38 | Conditions collapsed into a handful of glyphs; the card lost its information |
+| Daily block built as rows instead of 67 dp columns | §39 | Same data, different screen: the sideways strip *is* the daily block |
+| A bottom tab bar the original never had | §40 | The single most iOS-looking element on the screen, and upstream has no bottom navigation |
+| App bar colour derived from loaded data (SwiftUI ignores it) | §41 | White bar, invisible items; resolved as a recorded deviation, not a workaround |
+| Identifiers a UI test could not see (link subtrees, containers, unscoped `navigationBars`, `Menu` taps) | §42 | Five failing assertions that were test defects, not app defects |
+
+Measured inventory: `../02_case_study/UPSTREAM_ATLAS.md` §7.
+
 What this pass did **not** add: a reconstruction of the 74 provider integrations (the port ships
 one), the 15 widget providers (WidgetKit needs a redesign, not a transcription), or the live
 wallpaper (no iOS counterpart). Those are documented as deviations rather than backlog.

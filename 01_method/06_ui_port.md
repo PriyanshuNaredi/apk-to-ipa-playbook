@@ -43,6 +43,34 @@ underneath. The structural fix is parity: the bar is a sibling in the layout, no
 gap between four bar items — 24 pt left of screen centre. Overlaying them on the full bar width,
 then testing `midX == window.midX` within 1 pt, made it unarguable.
 
+## The look is in the layouts, not in the theme
+
+A port can have every card, every value and every tab and still be unrecognisable, because the
+things that make a screen *look like itself* are spread across resource files that nobody reads
+first. Read them before writing a single view, and write down the answers:
+
+| Question | Where the answer is | What it decided in this playbook's second port |
+|---|---|---|
+| What shapes exist? | `app:shapeAppearance` on each `res/layout/container_*.xml` | 12 of 15 containers declare one: 8 `Corner.ExtraLarge`, 4 `Corner.Full`; header, clock and UV declare none. Two shapes, not one, and not a theme default |
+| Are half-size cells square? | `app:layout_constraintDimensionRatio="1:1"` | 10 containers pin a square block inside the card. Frame paired half cards to a square or they stand at different heights |
+| How big is the number? | `res/values/styles.xml`, a per-block `TextAppearance` | 45 sp for the block value, 140 sp for the header, 16 sp title, 14 sp content, 12 sp subtitle. Copy the scale; do not reuse `.title2` |
+| Is the unit part of the value? | the holder code (`formatUnitsHalfSize`) | No: value and unit are separate views with different sizes. A single formatted string cannot be restyled to match |
+| What does a trend block look like? | `res/values/dimens.xml` | `trend_item_width` 67 dp, `daily_trend_item_height` 298 dp — one fixed-width column per day, scrolling sideways, not a row list |
+| Where does the artwork come from? | the icon provider (`res/xml/icon_provider_*.xml`) | A resource-name lookup with 153 filter entries over 85 PNGs and 83 distinct conditions; only 2 conditions have separate day/night files |
+| What navigation exists? | `res/menu/*.xml` and the activity layout | An up button, an edit action and an overflow menu. No bottom navigation, so a port must not add one |
+
+Two consequences worth repeating, because they cost the most time:
+
+- **A shape attribute is per-container.** Extracting "the corner radius" from a theme is the wrong
+  file; the containers disagree on purpose (defect §37).
+- **Icons are content, not decoration.** Substituting the platform's symbol set collapses 83
+  conditions into a handful of glyphs and changes what the screen communicates (defect §38). Copy
+  the drawables and port the *lookup*, then test that every name the lookup can produce resolves to
+  a file.
+
+Nothing in this section requires reading Kotlin: all seven answers are XML, and all seven can be
+gathered by `grep` in a few minutes.
+
 ## Wording is part of the screen
 
 Every string comes from the original, including awkward ones ("Interpolated model temperature").

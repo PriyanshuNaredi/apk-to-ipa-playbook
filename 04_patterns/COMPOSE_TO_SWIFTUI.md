@@ -96,6 +96,30 @@ the continuation from `onCancel`.
 | `BackHandler(enabled) { … }` | `onBack` closure + explicit button; no system back on iOS gesture-only |
 | Manual `rememberSaveable` screen | `@SceneStorage` or an explicit restoration test |
 
+## Chrome: bars, sheets, and what a test can see
+
+The material-to-SwiftUI translation is the easy half. The half that silently changes the product is
+container choice and bar treatment.
+
+| Android | SwiftUI | Trap |
+|---|---|---|
+| `MaterialCardView` + `app:shapeAppearance` | `RoundedRectangle(cornerRadius:)` or `Circle()` behind a `ZStack` | A circle drawn behind a taller `VStack` lets the content spill outside the circle. `ZStack { Circle(); content }` with `aspectRatio(1, .fit)` keeps content inside |
+| `MaterialCardView` with no shape attribute | plain background, no shape | "Every card is rounded" is an assumption; three containers in the measured upstream have no shape at all |
+| Activity with up button + overflow menu | `NavigationStack` + leading/trailing `ToolbarItem` | Do not fill the vacuum with a `TabView`. If upstream has no bottom navigation, a tab bar is a new feature (§40) |
+| App bar tinted with the weather colour | `.toolbarBackground(color, for: .navigationBar)` | A colour that depends on loaded data is captured before the data exists and never re-applied; store nothing, choose a news-free treatment and record the deviation (§41) |
+| `startActivity` to a settings screen | `.sheet { }` | A sheet whose content has its *own* `NavigationStack` swallows the presenter's `Done` toolbar item. Either the screen owns its dismiss button (`.toolbar` inside its stack, driven by an `onDone` closure) or the sheet does not wrap it again |
+| `RecyclerView` with `LinearLayoutManager(VERTICAL)` | `ForEach` in a `VStack` | Check the column width and item height in `dimens.xml` first; a horizontal strip and a vertical list look identical in a thumbnail (§39) |
+| Icon from `res/drawable` by computed name | `UIImage(named:)` on a bundled asset | Loose PNGs copied by the resources phase are not in `Assets.car`; load them via `Bundle.main.path(forResource:ofType:)` + `UIImage(contentsOfFile:)`, or convert to an asset catalogue. A silent fallback symbol hides the mistake |
+
+### Making accessories testable
+
+| Want | Works | Does not work |
+|---|---|---|
+| Identify a card | identifier on the `NavigationLink`, with `.accessibilityElement(children: .contain)` | identifier on a `VStack` inside it — the link collapses the subtree |
+| Identify a metric | identifier on the leaf `Text` | identifier on the container `HStack` |
+| Tap the overflow menu | `Button` + `confirmationDialog` | `Menu` in a toolbar: the tap is treated as a scroll and can fail with `kAXErrorCannotComplete` |
+| Tap a back button | `app.navigationBars["Appearance"].buttons.firstMatch` | `app.navigationBars.buttons.firstMatch` — matches the presenter's bar under a sheet |
+
 ## Verification equivalents
 
 | Need | Android | This port's iOS answer |

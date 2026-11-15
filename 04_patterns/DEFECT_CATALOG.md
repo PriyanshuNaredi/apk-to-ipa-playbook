@@ -579,6 +579,144 @@ can see it was a decision, not an oversight.
 
 ---
 
+## 37. Card shapes invented instead of read
+
+**Symptom:** the port has a consistent, pleasant corner radius on every card and looks nothing like
+the original, which has **exactly two** shapes — a circle and one rounded size.
+
+**Cause:** the shape is not in the theme, it is an attribute on each container. In the upstream
+measured for this playbook, 15 `res/layout/container_main_*.xml` files carry 12 `app:shapeAppearance`
+declarations: 8 `Corner.ExtraLarge`, 4 `Corner.Full`, and 3 declare none at all. A theme-level
+`MaterialTheme.shapes` reading is the wrong file.
+
+**Fix:** extract the shape attribute per container into a table *before* writing any card view, and
+make the card view take the shape as a parameter. Anything without an attribute keeps its own
+treatment — the header, clock and UV blocks in the same app are neither.
+
+```bash
+# the whole table, in one command
+grep -H "shapeAppearance" res/layout/container_main_*.xml | sed 's#.*container_main_##'
+grep -L "shapeAppearance" res/layout/container_main_*.xml
+```
+
+**Related:** a circle only looks like a circle because its inner block is constrained square
+(`app:layout_constraintDimensionRatio="1:1"` on 10 of those containers). Port the square cell as a
+square cell, or a rounded rectangle next to a circle in the same row will not stand level.
+
+**Write this test:** a Swift unit test that maps every card kind to a shape and asserts the count
+per shape equals the number found in the layouts.
+
+---
+
+## 38. Platform icon set substituted for the original's artwork
+
+**Symptom:** every card has the right content and a wrong picture. Conditions that exist
+(`partly_cloudy`, `haze`, `sleet`) have no SF Symbol, so they collapse into three or four glyphs and
+the screen loses its information density.
+
+**Cause:** the icons were treated as decoration. Upstream computes a resource name —
+`Constants.getResourcesName(code) + "_" + (daylight ? "day" : "night")` — and resolves it through a
+filter XML that maps missing variants onto shared artwork. 153 `<item>` entries, 85 PNGs, 83 distinct
+conditions, and only **2** of those conditions (`clear`, `partly_cloudy`) actually have separate day
+and night files.
+
+**Fix:** copy the drawables and port the *lookup* as code. Then make a test resolve every name the
+lookup can produce against the bundled files, so a condition with no artwork fails the suite instead
+of drawing a fallback symbol in the shipped app:
+
+```swift
+for code in WeatherCode.allCases {
+    for day in [true, false] {
+        let name = WeatherIcons.name(for: code, day: day)
+        XCTAssertNotNil(Bundle.main.path(forResource: name, ofType: "png"), name)
+    }
+}
+```
+
+**Licence note:** redistribute the artwork only alongside the upstream licence and a statement of
+what was changed — see `01_method/09_release.md`.
+
+**Write this test:** the resolver test above; it is the cheapest possible guard and it caught the
+day/night split rule in this playbook's second port.
+
+---
+
+## 39. Trend block built as rows
+
+**Symptom:** the daily card is a vertical list of days. The original is a sideways strip: five or six
+columns of weekday, date, icon, high, low, all scrolling together over one chart.
+
+**Cause:** the container name (`RecyclerView` with a `LinearLayoutManager`) does not say which axis,
+and the columns look like rows in a screenshot until you count them.
+
+**Fix:** read the dimens. `trend_item_width` 67dp, `daily_trend_item_height` 298dp: one column per
+day, fixed width, under a single shared chart. On iOS that is `ScrollView(.horizontal)` around an
+`HStack` of 67 pt columns with the chart beneath — not `ForEach` over rows.
+
+**Write this test:** a UI test that asserts two or more day headers exist *and* that the container
+scrolls horizontally (swipe, then assert the first day's x origin moved).
+
+---
+
+## 40. Platform chrome the original never had
+
+**Symptom:** the port is recognisably an iOS app in a weather costume: bottom tab bar, sheet
+navigation, back arrow where the original has a hamburger.
+
+**Cause:** "how do people navigate on this platform" was answered before "how does *this app*
+navigate". The original's main activity has an up button, an edit action and an overflow menu — no
+bottom navigation of any kind.
+
+**Fix:** inventory upstream's navigation from `res/menu/` and the activity layout *before* choosing
+an iOS container, and write the inventory into the parity spec. Removing a tab bar afterwards is
+cheap; removing the habit is not.
+
+**Write this test:** `XCTAssertEqual(app.tabBars.count, 0)` when upstream has none. A negative
+assertion is odd-looking and it is the only thing that stops the chrome coming back.
+
+---
+
+## 41. A bar colour that arrives after the bar is built
+
+**Symptom:** the app bar renders white/blank while every other surface is correct, and toolbar items
+are invisible because their tint was chosen for the weather colour.
+
+**Cause:** SwiftUI evaluates `toolbarBackground` when the navigation container is built. A colour
+derived from data loaded later — the current condition, in this case — is captured as nil and never
+re-applied, even when it is stored in `@State` and updated from `onChange`. (`toolbarBackgroundVisibility`
+only exists from iOS 18, and the deployment target was 17.)
+
+**Fix:** choose a bar treatment that does not depend on network data — a material blur over the same
+backdrop reads correctly at every scroll offset — and record the deviation instead of fighting the
+framework. If the bar must follow the weather, resolve the colour *before* first paint (cache the
+last condition), or require iOS 18 and set visibility explicitly.
+
+**Write this test:** a screenshot with one specific question ("is the bar the weather colour?"). No
+unit test can see this.
+
+---
+
+## 42. UI tests that cannot see the thing they assert
+
+**Symptom:** tests fail on identifiers that exist in the code, or pass while the screen is wrong.
+
+Four separate causes, all seen in one port:
+
+1. **A `NavigationLink` collapses its subtree.** Inner identifiers disappear once the card is a link;
+   assert on the link, or move the identifier to a leaf outside the link.
+2. **`.accessibilityIdentifier` on a plain container is invisible.** A container is not an element
+   until `.accessibilityElement(children: .contain)` precedes the identifier.
+3. **`app.navigationBars.buttons.firstMatch` is unscoped.** With a sheet open it matched the
+   presenter's bar underneath, and the tap failed with `kAXErrorCannotComplete` on a scroll action.
+   Scope every query to a named bar.
+4. **A `Menu` in a toolbar is unreliable to tap.** Replace it with a `Button` opening a
+   `confirmationDialog`; the identifier then behaves like any other button.
+
+**Write this test:** dump `app.debugDescription` to a file from a throwaway test the first time a
+query disagrees with the source. It answers "does the element exist" in one run instead of five.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash

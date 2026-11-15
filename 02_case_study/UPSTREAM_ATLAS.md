@@ -100,3 +100,40 @@ print({t:len(re.findall('<%s[^>]*android:name'%t,x)) for t in ['activity','servi
 ls data/src/main/sqldelight/breezyweather/migrations | wc -l
 find . -path '*/test/*' -name '*.kt' | wc -l
 ```
+
+---
+
+## 7. The look, counted by command
+
+The second port's first main screen had every card, every value and every tab, and looked nothing
+like the original. The reason was not the data layer: it was six resource facts nobody had read. They
+are cheap to gather and they decide the whole appearance, so they are measured here the same way as
+the module sizes above.
+
+```bash
+cd app/src/main/res
+ls drawable/weather_*.png | wc -l                                   # 85
+ls drawable/weather_*.png | grep -c '_day\.png'                     # 2
+ls drawable/weather_*.png | grep -c '_night\.png'                   # 2   (so 2 conditions, not 85, split)
+grep -c '<item' xml/icon_provider_drawable_filter.xml               # 153
+ls drawable/weather_*.png | sed 's#.*weather_##;s#_day\.png##;s#_night\.png##;s#\.png##' | sort -u | wc -l   # 83 bases
+grep -H 'app:shapeAppearance' layout/container_main_*.xml | wc -l   # 12 of 15 containers
+grep -h 'app:shapeAppearance' layout/container_main_*.xml | grep -c 'Corner.Full'         # 4
+grep -h 'app:shapeAppearance' layout/container_main_*.xml | grep -c 'Corner.ExtraLarge'   # 8
+grep -L 'app:shapeAppearance' layout/container_main_*.xml           # clock, header, uv: none
+grep -l 'layout_constraintDimensionRatio="1:1"' layout/container_main_*.xml | wc -l  # 10
+grep 'trend_item_width\|daily_trend_item_height\|main_title_text_size\|title_text_size' values/dimens.xml
+grep -A3 'MainBlock.NumberDigit' values/styles.xml                  # 45sp, letterSpacing 0
+```
+
+| Fact | Value | Why it decides the screen |
+|---|---|---|
+| Card shapes | 2 in use: `Corner.Full` ×4, `Corner.ExtraLarge` ×8; 3 containers declare none | A port with one radius is wrong twice: too round in some places, not round enough in others |
+| Square cells | 10 containers constrain a `1:1` block | The circular cards are circles *because* the cell is square; a neighbour rect then has to match that height |
+| Block value | 45 sp, `letterSpacing` 0 | The header number is 140 sp and the titles 16 sp. Copying the scale is what makes the screen read as the same product |
+| Trend geometry | `trend_item_width` 67 dp, `daily_trend_item_height` 298 dp | One fixed-width column per day, scrolled sideways under a shared chart — a vertical list is a different screen |
+| Weather artwork | 85 PNGs, 83 conditions, 153 filter entries, 2 day/night splits | Icons are content: SF Symbols would collapse 83 conditions into a handful of glyphs |
+| Navigation | `res/menu/activity_main.xml`: `action_edit`, `action_open_in_other_app`; no bottom navigation anywhere | The iOS look-alike move (a tab bar) is a feature the original does not have |
+
+The two lessons for the method are in `../01_method/06_ui_port.md` ("The look is in the layouts, not
+in the theme") and defects §37–§42. Everything above is XML: this section needed no decompiler.

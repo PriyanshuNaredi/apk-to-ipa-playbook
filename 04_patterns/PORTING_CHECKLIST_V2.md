@@ -67,6 +67,17 @@ screenshot is not a tick.
 - [ ] Every count string pluralized in resources — defect §34
 - [ ] Pseudo-locale run for truncation, RTL run for hand-drawn views — `15_localization.md` §4
 - [ ] Settings shows only what the platform honours; no dead pickers — defect §27
+- [ ] Card shapes read from `app:shapeAppearance` per container, with a test pinning the count per
+      shape — defect §37, `06_ui_port.md` "The look is in the layouts"
+- [ ] Half-size cells framed square when the layout constrains them `1:1` — defect §37
+- [ ] Weather artwork taken from the drawables and resolved by the ported lookup; a test asserts
+      every producible name has a file — defect §38
+- [ ] Trend blocks are sideways columns at the dimens' fixed width, not rows — defect §39
+- [ ] Navigation inventory taken from `res/menu/` and the activity layout; no tab bar unless upstream
+      has one, and a test asserts its absence — defect §40
+- [ ] No bar treatment that depends on network data — defect §41
+- [ ] Every UI identifier on a leaf or on a link/container declared with `children: .contain`; every
+      `navigationBars` query scoped by title — defect §42
 
 ## Background, cache, notifications
 
