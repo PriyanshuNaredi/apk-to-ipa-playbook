@@ -765,6 +765,30 @@ gate catches both.
 
 ---
 
+## 45. The tag build that published nothing
+
+**Symptom:** every push to `main` is green; the first tagged build fails at the last step
+with `403 Resource not accessible by integration`. There is no release, so the install
+instructions point at a download that does not exist.
+
+**Cause:** `GITHUB_TOKEN` is **read-only by default** on repositories created recently.
+Building and uploading the workflow artifact is a read; creating a release and attaching
+an asset is a write.
+
+**Fix:** declare it, and refresh the tag afterwards, because a tag build runs the workflow
+*at that tag*, so fixing the file on `main` does not fix the run you already queued:
+
+```yaml
+permissions:
+  contents: write
+```
+
+Then move the tag onto the fixed commit (`git tag -f vX.Y.Z && git push -f origin vX.Y.Z`)
+and confirm the asset exists — `GET /repos/{owner}/{repo}/releases` and check `assets[].size`,
+not just the green tick.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash
