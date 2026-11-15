@@ -870,6 +870,44 @@ boundaries — the two disagreeing hours are exactly the ones a casual test miss
 
 ---
 
+## 48. Two source fields that disagree — and the port has no words for it
+
+**Symptom:** the screen contradicts itself. A rainy backdrop and a rainy condition title
+above a card that says "No precipitation". The user asks the obvious question: *is it
+raining or not?*
+
+**Cause:** the replacement API answered two different questions. On Berlin at 18:00 it
+sent `weather_code 61` ("slight rain") **and** `precipitation: 0.0`, `rain: 0.0`,
+`showers: 0.0` — in `current`, in every hourly entry, and in all eight 15-minute steps
+covering the next two hours. Upstream cannot reach this state, because one provider fills
+the code and the minutely series together, so upstream has no string for it: its empty
+state is a bare "No precipitation".
+
+**Fix:** keep both faithful, and add the sentence upstream never needed:
+
+```swift
+var currentIsWet: Bool {           // the observation's own verdict
+    [.rain, .snow, .sleet, .hail, .thunder, .thunderstorm].contains(current?.weatherCode)
+}
+// only when the charted window is empty and the observation says precipitation
+summary == currentIsWet ? "No precipitation expected in the next 2 hours"
+                        : "No precipitation"
+```
+
+Rules that keep this honest:
+
+- the flag must come from the *source's own field*, not from a re-threshold of the chart;
+- it changes copy, never data — no invented millimetres, no hidden bars;
+- it applies only to the empty window, so a wet forecast keeps the upstream wording.
+
+**How to find the next one:** for every card, write down which source field decides its
+*appearance* and which decides its *numbers*. If they are different fields, ask what the
+card says when the two disagree — and check the live API for that state before assuming it
+is rare. Record the extra copy as a numbered deviation; it is a deliberate departure, not
+a bug, and the next reader needs to know why.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash
