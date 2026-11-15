@@ -424,6 +424,67 @@ for this region" note, that note belongs in the port as a gate and as UI copy.
 
 ---
 
+## 27. A flag the tests pass and the app ignores
+
+**Symptom:** a unit assertion passed in one run and failed in the next. Nothing about the code had
+changed.
+
+**Cause:** the UI tests launched with `-resetState`, and nothing implemented it. Each run inherited
+whatever the previous manual session had saved, so the "default" unit was whatever was last chosen.
+
+**Fix:** implement the flag where state is loaded (`AppState.init`), and clear every persisted key,
+not just the one you remember.
+
+**Rule:** a test-only launch argument is production code. Assert it does something (a test that sets
+a non-default value, relaunches without the flag, and sees the default again).
+
+---
+
+## 28. The header colour that was decided before there was a header
+
+**Symptom:** the navigation title was black on a night-coloured background, so it was invisible.
+
+**Cause:** `.toolbarColorScheme()` was evaluated while the weather was still `nil` and never
+re-evaluated, while the header text underneath recomputed from the loaded data. Two colour decisions
+with different lifetimes.
+
+**Fix:** derive both from one value and apply it explicitly (`.foregroundStyle`, `.tint`), rather than
+relying on a modifier that snapshots its input.
+
+**Checklist item:** if a screen has two places that must agree, make them read the same expression.
+"Probably the same" is how a black-on-black title ships.
+
+---
+
+## 29. Night with a sun in it
+
+**Symptom:** the "Nighttime" half of the details panel showed a sun icon and "Clear".
+
+**Cause:** one symbol table for day and night. The label was computed from the hour, the picture from
+the weather code.
+
+**Rule:** any label that names a period must colour, icon and format itself from that same period.
+This is the screenshot equivalent of defect 23 (a card whose title and picture disagree), and it is
+caught by looking, not by tests.
+
+---
+
+## 30. Judging a test run by its text
+
+**Symptom:** `macos-tests.sh` reported failure on green runs, roughly every time.
+
+**Cause:** it decided success by grepping the log for `error:`. XCTest logs
+`Failed to scroll to visible … error: Error kAXErrorCannotComplete` when a tap falls back to another
+path — a line that appears in successful runs.
+
+**Fix:** judge by the exit code *and* the tool's own verdict (`TEST SUCCEEDED`), and use the text only
+to explain a failure that already happened.
+
+**Rule:** this is defect 18 again (a text filter deciding success), two layers up. When you write a
+script that watches another tool, ask which line means "the tool said yes", and use that one.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash
