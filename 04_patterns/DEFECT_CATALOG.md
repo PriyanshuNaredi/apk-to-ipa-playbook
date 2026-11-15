@@ -314,6 +314,40 @@ where guessing had already cost two. Keep it in a file named to sort last
 
 ---
 
+## 21. A "reasonable" aggregation that silently differs from upstream
+
+**Symptom:** the air-quality number is wrong on some days, right on others, and
+nobody can say why. Comparisons against the Android app disagree intermittently.
+
+**Cause:** the headline index is the max over **four** pollutants (O3, NO2, PM10,
+PM25), not all six. CO and SO2 are displayed but never drive the number. A port that
+"obviously" maxes every pollutant is right most of the time and wrong on any day
+when CO or SO2 is the extreme value.
+
+**Rule:** when upstream has a derived scalar (an index, a severity, a level), port
+the *exact set of inputs* it uses and write a test where an excluded input is
+deliberately extreme. Here: `AirQuality(pm25: 5, co: 10_000)` must still index 20.
+
+**Related smell:** interpolation that *clamps* above its last breakpoint. Upstream
+continues linearly (300 µg/m³ PM2.5 → 500, not 250). A clamp looks safer and hiddenly
+diverges on polluted days — the days a weather app is most likely to be looked at.
+
+---
+
+## 22. Dictionary order in a test makes it flaky, not the code
+
+**Symptom:** the same test passed three runs in a row, then failed in the combined
+suite. No code change in between.
+
+**Cause:** `mapped.values.first` — dictionary iteration order is unspecified. In one
+process the "first" value had data; in another it was an all-nil hour.
+
+**Rule:** never take `.first` / `.last` on a Dictionary or Set in a test. Name the
+element you mean (`mapped[mapped.keys.min()!]`). A test that can pass by luck will,
+and then it will fail in CI on someone else's branch.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash
