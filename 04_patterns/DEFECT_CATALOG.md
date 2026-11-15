@@ -717,6 +717,54 @@ query disagrees with the source. It answers "does the element exist" in one run 
 
 ---
 
+## 43. The background approximated instead of ported
+
+**Symptom:** every weather condition looks the same. The screen is recognisably the app —
+cards, numbers, wording — with a generic wash behind it. Rain, snow and a clear noon are
+indistinguishable at a glance.
+
+**Cause:** the backdrop was treated as decoration. In the measured upstream it is two
+things: a **gradient asset per condition** (`res/drawable{,-night}/weather_background_*.xml`,
+12 files plus 11 night-theme overrides, three stops each, angle 270) and a **geometric
+scene** drawn over it by an animation implementor (rotating squares for the sun, breathing
+circles for cloud, 75 rounded streaks for rain, 50 circles for snow, 160 thin gusts for
+wind, 50–70 stars and 10 meteors at night, a violet flash for thunder). None of that is a
+blurred circle, and none of it is in the theme.
+
+**Fix:** port both halves as *data*, not as drawing code:
+
+1. Enumerate the background drawables by (kind, daylight) and the `-night` qualifier; pin
+   every stop colour in a test.
+2. Read each implementor for counts, colours, sizes and speeds — they are constants at the
+   top of each class (`RAIN_COUNT = 75`, `SNOW_COUNT = 50`, `HAIL_COUNT = 51`,
+   `WIND_COUNT = 160`, `SUN_POSITION = 0.5`, alphas `0.16/0.08/0.04`).
+3. Make particle positions a function of time (`position = f(seconds)`) instead of a stepped
+   simulation. Nothing drifts, nothing leaks, and pausing is free.
+4. Measure the frame rate. 30 fps cost ~10% CPU in the simulator and bought nothing visible;
+   20 fps measured ~5.5% and looks the same. Ship the setting that pauses it.
+
+**Write this test:** one per number. Gradient stops hex for hex, particle counts, the sun's
+three alphas, and a determinism test that the same seed produces the same scene.
+
+---
+
+## 44. A test count that ignored half the tests
+
+**Symptom:** the CI gate "a run that executes nothing fails" passes, and the reported test
+count stops moving when new tests are added.
+
+**Cause:** the script scraped one framework's summary line. XCTest prints
+`Executed N tests`; Swift Testing prints `Test run with N tests passed`. Summing only the
+first silently excluded every `@Test` suite — 7 of 106 tests here, including the new ones.
+
+**Fix:** parse both, add them, and print the split (`106 (99 XCTest + 7 swift-testing)`) so
+the next reader can see which layer is which. Fail if the sum is 0.
+
+**Write this test:** inject a deliberate failure in each framework once, and confirm the
+gate catches both.
+
+---
+
 ## Cheap sweep before you call a port done
 
 ```bash

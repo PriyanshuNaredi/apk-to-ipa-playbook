@@ -76,6 +76,11 @@ screenshot is not a tick.
 - [ ] Navigation inventory taken from `res/menu/` and the activity layout; no tab bar unless upstream
       has one, and a test asserts its absence — defect §40
 - [ ] No bar treatment that depends on network data — defect §41
+- [ ] Background is the upstream's asset gradient per (kind, daylight, theme) **and** its
+      animated scene, with every stop colour and particle count pinned by a test —
+      defect §43
+- [ ] Frame rate measured, not assumed; a setting exists to pause the animation — defect §43
+- [ ] The test gate counts every framework in the output and prints the split — defect §44
 - [ ] Every UI identifier on a leaf or on a link/container declared with `children: .contain`; every
       `navigationBars` query scoped by title — defect §42
 

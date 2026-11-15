@@ -96,6 +96,8 @@ defects (§37–§42) came out of it, none of them in the data layer:
 | A bottom tab bar the original never had | §40 | The single most iOS-looking element on the screen, and upstream has no bottom navigation |
 | App bar colour derived from loaded data (SwiftUI ignores it) | §41 | White bar, invisible items; resolved as a recorded deviation, not a workaround |
 | Identifiers a UI test could not see (link subtrees, containers, unscoped `navigationBars`, `Menu` taps) | §42 | Five failing assertions that were test defects, not app defects |
+| The background approximated as a blurred wash | §43 | Every condition looked the same; upstream ships 12 gradient assets and 6 animated scenes |
+| The test gate counted one framework's output | §44 | 7 of 106 tests — the new ones — were missing from the count and from the zero-tests gate |
 
 Measured inventory: `../02_case_study/UPSTREAM_ATLAS.md` §7.
 
