@@ -1,25 +1,27 @@
 # APK → IPA Playbook
 
 How to take an Android app you have the source (or only the APK) for, and rebuild it as a
-native iOS app that a user cannot tell apart — plus the full record of doing it **twice**,
-defects and all.
+native iOS app that a user cannot tell apart — plus the full record of doing it **three
+times**, defects and all.
 
 This is not a single successful port written up afterwards. The method was applied to one
-small app, tightened, and then applied again to an upstream **about sixty times larger and
-under a different licence** — and the second run is what added half of what is here. Both
-ports are real and both are public; the second one builds its unsigned IPA in CI on every
-push:
+small app, tightened, applied again to an upstream **about sixty times larger and under a
+different licence**, and then applied a third time to a **native C++ game** where the right
+answer was not to rewrite anything at all. The second run added half of what is here; the third
+added a whole different failure mode (§18, §50–§58). All three ports are real, and two of them
+build their unsigned IPA in CI:
 
-| | Port 1 | Port 2 |
-|---|---|---|
+| | Port 1 | Port 2 | Port 3 |
+|---|---|---|---|
 | Upstream | [Weather for Android](https://github.com/Kian-hdr/Weather) — Kotlin, Jetpack Compose, MapLibre GL, MIT, v1.1.1 | [Breezy Weather](https://github.com/breezy-weather/breezy-weather) — Kotlin, Compose, 6 Gradle modules, LGPL-3.0, v6.2.2 |
-| Upstream size | 2,144 lines Kotlin | 1,358 Kotlin files, ~136,700 lines, 6 modules |
-| Port | [weather-ios-port](https://github.com/PriyanshuNaredi/weather-ios-port) | **[Gust](https://github.com/PriyanshuNaredi/gust)** |
+| Upstream size | 2,144 lines Kotlin | 1,358 Kotlin files, ~136,700 lines, 6 modules | C++ game, 300k lines, axmol engine, version 17 |
+| Kind of port | Compose → SwiftUI rewrite | Compose → SwiftUI rewrite | **cross-compile the same source**, replace the platform layer |
+| Port | [weather-ios-port](https://github.com/PriyanshuNaredi/weather-ios-port) | **[Gust](https://github.com/PriyanshuNaredi/gust)** | [bim-ios-port](https://github.com/PriyanshuNaredi/bim-ios-port) (private until the device run is done) |
 | CI + IPA | [run green](https://github.com/PriyanshuNaredi/weather-ios-port/actions/runs/43656216367); IPA + sha256 on [v1.1.1-6](https://github.com/PriyanshuNaredi/weather-ios-port/releases/tag/v1.1.1-6) | [run green](https://github.com/PriyanshuNaredi/gust/actions/runs/43729204363); 1.79 MB IPA on [v0.2.0](https://github.com/PriyanshuNaredi/gust/releases/tag/v0.2.0) |
-| Swift written | 6,079 lines across 30 files | 8,157 lines across 61 files |
-| Tests | 87 logic + 11 UI | 99 logic + 10 UI |
-| Defects it produced | 22 (`02_case_study/DEFECTS.md`) | 12 more catalogued (§31–§42), after the audit of the upstream |
-| What the port taught the method | the visual audit, the CPU metric, the parity ledger, the defect catalog | the non-visual half (`01_method/11`–`17`), the surface map, the look-in-the-resources rule (§37–§42) |
+| Swift written | 6,079 lines across 30 files | 8,157 lines across 61 files | **none** — one app target + 4 patches + 21 scripted edits |
+| Tests | 87 logic + 11 UI | 99 logic + 10 UI | no unit tests exist; verification is architectural (both arches, seams, artefact checks) |
+| Defects it produced | 22 (`02_case_study/DEFECTS.md`) | 12 more catalogued (§31–§42), after the audit of the upstream | 9 more, all in the toolchain (§50–§58) |
+| What the port taught the method | the visual audit, the CPU metric, the parity ledger, the defect catalog | the non-visual half (`01_method/11`–`17`), the surface map, the look-in-the-resources rule (§37–§42) | `01_method/18`: pin ≠ tag, dependency ABI, shader packaging, seams instead of taps, safe area in the data, plist keys installers check |
 
 The first port made the playbook possible. The second port is why it is worth reading: the
 things it got wrong on a 1,358-file upstream — providers, cache validity, locale defaults,
@@ -35,7 +37,7 @@ says "this happens" and you want to know how it actually looked.
 
 | Layer | Directory | What it gives you |
 |---|---|---|
-| **Playbook** (reusable) | `01_method/`, `04_patterns/` | 10 stages plus 7 non-visual subsystem docs, entry/exit gates, Compose→SwiftUI mapping tables, 49 catalogued defects, checklists |
+| **Playbook** (reusable) | `01_method/`, `04_patterns/` | 10 stages plus 8 non-visual subsystem docs (including `18_engine_ports.md` for apps you cross-compile instead of rewriting), entry/exit gates, Compose→SwiftUI mapping tables, 58 catalogued defects, checklists |
 | **Case study** | `02_case_study/`, `03_rea/`, `06_evidence/` | commit-by-commit timeline, defects with root cause and proof, parity ledger, a measured atlas of [Breezy Weather 6.2.2](https://github.com/breezy-weather/breezy-weather), REA findings we acted on, screenshots and logs |
 
 ## The 10 stages
@@ -85,6 +87,28 @@ Measured on the public port at tag `v0.2.0`, not estimated:
 | Visual parity | card shapes taken from `app:shapeAppearance` (8 `ExtraLarge`, 4 `Full`), 85 upstream weather drawables resolved by a ported lookup, 67 dp trend columns, no tab bar — the original has none |
 | What the method was missing before this port | 7 subsystem documents (`11`–`17`), a measured upstream atlas, and 12 defect entries |
 | Licence outcome | LGPL-3.0 with upstream's `LICENSE_ADDITIONAL`: renamed, new icon, notices in the app and at the repo root — see `00_overview/LICENCES.md` |
+
+## Results at a glance: port 3 (Bim! 17 → an iOS game)
+
+The third port is deliberately a different animal: same APK-to-iOS goal, opposite strategy. The
+game is not rewritten at all.
+
+| Metric | Value |
+|---|---|
+| Upstream surveyed | the APK (65.3 MB, 302 entries) plus the C++ source at the pin: game modules, axmol app targets, 347 atlas frames, 93 animations, 337 KB of style declarations, 20 gettext catalogues |
+| What the port adds | one app target (`apps/ios`, ~120 lines of `.mm`), 4 dependency patches, 21 scripted edits to the prepared tree, an icon generator, 3 packaging scripts |
+| What it does not add | any game logic, any layout, any string. The UI *is* the APK's own style data |
+| Dependency stack built for iOS | axmol `2.11.2.3j`, Boost `1.91.0`, jsoncpp `1.9.6`, EnTT `v3.16.0`, iscool-core `1.31.2`, moFileReader, libfpm, OpenAL Soft |
+| Verification | both architectures link; a seam-driven simulator run reaches the live production server, matches, plays and scores; safe area, icon, audio-at-the-API and the packaged-plist keys are each checked separately |
+| Release artefact | 31.6 MB unsigned IPA, arm64, iOS 17+, portrait, no `_CodeSignature` |
+| Defects found and fixed | 9, and **all nine are toolchain defects** — none are gameplay or UI logic (§50–§58) |
+| Deliberate gaps | in-app purchases (the server redeems Google Play tokens, so no client-side work can port them), plus everything only a phone can confirm: audibility, haptics, performance |
+| Licence outcome | AGPL-3.0: the port *is* a derivative work, so it ships upstream's `COPYING` and a full `CREDITS.md` |
+
+The lesson this port adds is uncomfortable and worth writing down: when the port is a
+cross-compile, **the game is free and the toolchain is the project**. Every hour went into the
+build system, the plist, the arch slice, the icon and the verification seams — not into the
+app, which was already correct.
 
 ## How to use this repo on the next port
 

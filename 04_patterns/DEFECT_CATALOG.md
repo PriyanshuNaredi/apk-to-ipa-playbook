@@ -962,3 +962,177 @@ grep -rn 'daily\[0\]\|hourly\[0\]' Sources              # 35
 grep -rn 'struct .*: WeatherProvider' Sources           # 31 (want >= 1)
 ps aux | grep "[W]eatheriOS.app/WeatheriOS" | awk '{print $3}'   # 1
 ```
+---
+
+## 50. A platform layer that compiles and does nothing
+
+**Symptom:** a settings toggle saves its state, the UI reflects it, and the phone does not
+react. Nothing in the log is wrong, and every test passes because the test asserts the
+preference, not the effect.
+
+**Cause:** the platform dispatcher picked a no-op on this target. `iscool-core` chose the
+Android implementation under `__ANDROID__` and `detail/haptic_feedback_mockup.hpp` everywhere
+else, so on iOS `haptic_feedback::click()` had always been an empty function. The game even
+called it, in the bomb code.
+
+**Fix:** write the platform implementation for the target, and **remove the mockup from that
+target's file list** — both files define the same class, so leaving the mockup in gives you
+`redefinition of 'haptic_feedback'` and you will be tempted to rename the class instead. Keep
+the class name; delete the mockup from the branch.
+
+**Write this test:** none exists for vibration. Assert the *dispatch*, once, by hand: build a
+binary whose platform file writes a line, and look at the line. Then put the effect on a
+device checklist and stop calling it done.
+
+---
+
+## 51. A prebuilt library slice that belongs to the other platform
+
+**Symptom:** the device build links, or fails with
+`ld: building for 'iOS', but linking in object file (...simulator/libjpeg.a[arm64](jaricom.o)) built for 'iOS-simulator'`.
+
+**Cause:** the staging script found the SDK's prebuilt xcframeworks with a wildcard,
+`.../ios-arm64_x86_64-simulator/libjpeg.a`. That path is correct for a simulator build and
+wrong for a device build; the slices have the same name inside.
+
+**Fix:** derive the slice from the build target, not from what `ls` found first:
+`ios-arm64_x86_64-simulator` when building for the simulator, `ios-arm64` when building for
+a device.
+
+**Write this test:** build for both targets in CI from the first day. A simulator-only build
+never sees this class at all.
+
+---
+
+## 52. A dependency stage that ignores `FORCE`
+
+**Symptom:** you fix a dependency, rerun with `FORCE=1`, and the binary is unchanged. The fix
+"did not work".
+
+**Cause:** one stage in the build script compiled a single `.cpp` by hand and returned early
+when the archive existed. The other stages honoured `FORCE`; this one did not, and it was the
+one being fixed. Worse, it also had the SDK and the target triple hard-coded to the simulator,
+so the archive was silently the wrong platform too (see §51).
+
+**Fix:** every stage takes the same three inputs — forced or not, which SDK, which arch — and
+none of them may be a literal.
+
+**Write this test:** run the failing configuration once with `FORCE=1` and diff the archive's
+timestamp. If it does not move, the stage ignored you.
+
+---
+
+## 53. A safe-area inset that eats a full-bleed backdrop
+
+**Symptom:** the top row of a game UI moves out from under the notch — and black bands appear
+top and bottom where the artwork used to reach the screen edges.
+
+**Cause:** the frame was inset into the safe-area rectangle. Correct for a list-based app,
+wrong for an app whose backdrop, pattern sprite and edge glows *bleed off screen by design*:
+the canvas is smaller than the visible screen, so the parts that were meant to be cropped are
+now missing.
+
+**Fix:** leave the canvas alone and move the layout *data*. Here the style declarations put
+every control at `anchor.reference.y` 0.90–0.99 of the screen height, so the port lowers
+exactly those anchors by the safe-area fraction (0.062 on an iPhone 16) and leaves the 1.0
+anchors — the bleed layers — untouched. 21 anchors moved; the artwork still reaches every edge.
+
+**Write this test:** sample the pixels at the outermost rows *and* screenshot the control that
+was under the notch. One test catches "the gear moved", the other catches "the edges are black".
+
+---
+
+## 54. A launch screen iOS cannot resolve → compatibility mode
+
+**Symptom:** the whole app renders into a window that excludes the safe area. Black bands top
+and bottom, artwork scaled up wrongly, and a huge glow from the top layer covering the menu.
+It reads as a renderer or shader bug, and the renderer is fine.
+
+**Cause:** the plist was modernised from `UILaunchStoryboardName` to an empty
+`UILaunchScreen` dictionary in a build that ships no compiled storyboard. iOS could not
+resolve a launch screen for the app, so it launched it *scaled*, as a legacy app.
+
+**Fix:** keep a launch-screen key iOS can resolve. An uncompiled `.storyboard` in the bundle
+is honoured for sizing; the modern dictionary is not a drop-in replacement when nothing
+compiles it.
+
+**Write this test:** pixel-probe row 1 and the centre row after any plist change. Two numbers
+tell you whether you are full-bleed. Do this *before* bisecting the renderer — this cost hours
+of renderer bisection for a one-line plist difference.
+
+---
+
+## 55. Plist keys that only installers check
+
+**Symptom:** the IPA is well-formed, the binary is the right arch, and installation is refused
+on the device with no useful message.
+
+**Cause:** `CFBundleSupportedPlatforms` was missing. Xcode injects it; a hand-written plist
+does not, and install tooling uses it to decide whether the app matches the platform it is
+being installed on. Missing reads as "not supported on this device".
+
+**Fix:** state the keys explicitly, and check them from the *packaged* IPA, not from the
+source plist: `CFBundleExecutable`, `Identifier`, `Name`, `ShortVersionString`, `Version`,
+`PackageType`, `MinimumOSVersion`, `UIDeviceFamily`, `SupportedPlatforms`, `Icons`.
+
+**Write this test:** unpack the IPA and assert all ten keys in CI, with `plutil` against
+`Payload/*.app/Info.plist`. Ten lines, and it is the only check that runs on the artefact a
+user installs.
+
+---
+
+## 56. The repository that cannot build after a clone
+
+**Symptom:** every script works on the author's machine, and the CI workflow fails on its
+second step.
+
+**Cause:** `analysis/` was in `.gitignore` — sources, engine, dependency clones and the
+decompiled APK all lived there. Everything the build reads was untracked, so the published
+repository contained none of it. The workflow was never run, because it triggers on tags and
+no tag had been pushed; the failure was invisible for exactly as long as nobody looked.
+
+**Fix:** write a `fetch-sources.sh` that recreates the ignored inputs from the pins already
+documented (shallow fetch by ref, plus the upstream release APK decompiled for its assets),
+call it from the prepare step when anything is missing, and make CI run it.
+
+**Write this test:** `git clone` the repository into a fresh directory and build there. Being
+able to build is not the same claim as being able to build *from what you published*.
+
+---
+
+## 57. A patch script that reports success and applies nothing
+
+**Symptom:** none. The script prints `applied 20 edits` and exits 0.
+
+**Cause:** new edits were appended after a `print()` call that an earlier edit had deleted, so
+the anchor string `print("   applied 14 edits")` no longer existed, the replacement silently
+did nothing, and the count in the message referred to edits that were not there. Two separate
+instrumentations vanished this way. The tell was an environment-gated dump that produced no
+output at all — the *absence* of the line, not an error.
+
+**Fix:** make the edit helper fail loudly when a patch point is missing (`patch point not
+found in <file>: <description>`), print the count it actually applied, and regenerate the tree
+from scratch on every build so a stale tree cannot mimic success.
+
+**Write this test:** grep the generated tree for a string each patch introduces. If the patch
+applies, the string is there. This is the seam-test minimum for any code-generating script.
+
+---
+
+## 58. "Audio works" verified by a microphone that cannot hear the speaker
+
+**Symptom:** a recording made while the game plays music has the same RMS as one made in
+silence. The conclusion "audio is broken" is wrong; so is "audio works".
+
+**Cause:** the machine's speaker does not reach its own microphone. Playing a system sound
+while recording left the level identical (`rms≈0.008`, peak matched), which invalidates the
+whole measurement — including the negative one.
+
+**Fix:** verify one layer below audibility. Instrument the mixer and record the value the audio
+API returns: `play2d` hands back `INVALID_AUDIO_ID` when the file is missing, initialisation
+failed or the backend could not create a player, so a real id proves the OGG was found,
+decoded and given to OpenAL. Two lines (`music audio/menu.ogg id=1`, `effect audio/tick.ogg
+id=2`) and one muting run for the negative case (`id=-1 (FAILED)`).
+
+**Write this test:** a recording that differs from a known-audible baseline. If the baseline
+does not move, the microphone is not a measurement device and neither is your conclusion.

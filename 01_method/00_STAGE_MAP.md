@@ -13,6 +13,12 @@ behaves differently in six places nobody tested".
   9 Release ──▶ 10 Retrospective (feeds 04_patterns/DEFECT_CATALOG.md)
 ```
 
+> **Before stage 1, one decision:** is this app Kotlin/Java or a native engine? If the APK is
+> Unity, Unreal, cocos2d-x, axmol or Godot — or any C++ engine with a thin platform layer —
+> do **not** rewrite it. Stages 5–7 collapse to nothing and the whole project moves into the
+> toolchain. Read `18_engine_ports.md` first; it has its own stage table, its own gates and its
+> own defect catalog entries (§50–§58). Stages 1–3 and 8–10 still apply as written.
+
 ## Stage 1 — Recon
 Establish what the app *is*, from evidence: screens, navigation, persistence keys, network
 endpoints, timings, cache budgets, permissions.
