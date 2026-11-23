@@ -1136,3 +1136,48 @@ id=2`) and one muting run for the negative case (`id=-1 (FAILED)`).
 
 **Write this test:** a recording that differs from a known-audible baseline. If the baseline
 does not move, the microphone is not a measurement device and neither is your conclusion.
+
+## 59. The seams that made the demo possible ship in the release
+
+**Symptom:** the app works, the IPA installs, and nothing is visibly wrong. The release binary
+still contains code that presses PLAY, accepts a match and opens screens by itself if an
+environment variable is set.
+
+**Cause:** test seams added so an untappable simulator can reach the game are ordinary C++
+compiled into every target. Nothing distinguishes a debug build from the one you hand out, and
+`getenv` is not a safety mechanism — on a device, `SIMCTL_CHILD_` becomes an ordinary variable
+any launcher, MDM profile or `xcrun devicectl launch --environment` can provide.
+
+**Fix:** put every seam inside `#if BIM_TEST_SEAMS`, define it as 1 for simulator builds and 0
+for device builds in the build script, and make the packaging step **fail** if the strings are
+still in the binary:
+
+```bash
+if /usr/bin/strings "$app/$name" | /usr/bin/grep -q 'BIM_AUTO'; then
+  printf 'error: %s contains test seams; rebuild with BIM_TEST_SEAMS=0\n' "$app/$name" >&2
+  exit 1
+fi
+```
+
+Verified by `strings` on the arm64 binary: zero matches, and the build log states which way the
+flag was set. The cost is a full rebuild when you switch, which is the correct cost.
+
+**Write this test:** `strings Bim | grep -c BIM_AUTO` against the artifact you actually ship, not
+against the tree you built it from.
+
+## 60. Documentation of an automation path that does not exist
+
+**Symptom:** a test-seams document lists six ways to drive the app. Two of them do nothing. The
+port still reached the arena every time, so nobody noticed.
+
+**Cause:** a rewrite of the preparation script dropped the edits that install two seams, and the
+document was never re-checked against the tree. The arena was reached because a real opponent
+accepted the match — the seam was credited for a human's click.
+
+**Fix:** the seam doc must be regenerated from, or checked against, the prepared source:
+`grep -c BIM_AUTOFIGHT build/ios-src/.../matchmaking.cpp`. The script now prints how many edits
+it applied (`applied 26 edits`), so a silently-empty run is visible in the log. Any claim in a
+document about an automation path needs a command that fails when the path is gone.
+
+**Write this test:** for every documented seam, a one-line grep of the prepared tree. Ten seconds
+of grep against a round of false confidence.

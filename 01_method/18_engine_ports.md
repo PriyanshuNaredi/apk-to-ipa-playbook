@@ -161,6 +161,39 @@ before the pixels said "you are not full screen".
 
 ---
 
+## 9. Inventory the surfaces before you believe the demo
+
+An engine port reaches a state where one path works end to end — launch, lobby, match, result —
+and that path is what every screenshot, every log and every demo shows. It is not the app. On
+this port, the inventory written *after* a successful live match turned up two screens no one had
+ever opened (the feature shop and the language popup) and demoted one row (player statistics) from
+"done" to "unverified", because its only evidence was a seam press and a memory.
+
+Write the inventory from the source, one row per surface, and give every row the file or
+observation that backs it:
+
+```bash
+ls build/ios-src/apps/*/main/src/<app>/app/screen/     # screens
+ls build/ios-src/apps/*/main/src/<app>/app/popup/      # popups, overlays, dialogs
+ls build/ios-src/apps/*/main/src/<app>/app/part/       # persistent widgets
+grep -rho '/client/[a-z/-]*' build/ios-src --include=*.cpp | sort -u   # server surface
+```
+
+Three statuses are enough: **verified** (evidence file named), **source-level only** (compiles and
+is reached, cannot be observed on this host — haptics, audio), **not ported** (and why: no
+StoreKit, no notification centre, no camera). A row with no evidence is not "probably fine", it is
+the next thing that breaks in a reviewer's hands.
+
+Reach for the screens the happy path skips. Two extra `BIM_AUTOPRESS` values cost an hour and
+turned "we ported the menus" into a screenshot of server-assigned prices on a real account.
+
+## 10. Keep automation out of the artifact
+
+Seams are the reason an untappable simulator can play a match, and they are also a way to drive a
+shipped app from an environment variable. Guard them at compile time and fail the packaging step
+if they survive (defect 59). The build log should say which way the flag was set; the check should
+run `strings` on the artifact, not on the tree.
+
 ## Exit gate for this route
 
 * Both architectures build: `ARM64 SIMULATOR=FALSE` and the host's own simulator arch.

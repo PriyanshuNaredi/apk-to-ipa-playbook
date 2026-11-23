@@ -37,7 +37,7 @@ says "this happens" and you want to know how it actually looked.
 
 | Layer | Directory | What it gives you |
 |---|---|---|
-| **Playbook** (reusable) | `01_method/`, `04_patterns/` | 10 stages plus 8 non-visual subsystem docs (including `18_engine_ports.md` for apps you cross-compile instead of rewriting), entry/exit gates, Compose→SwiftUI mapping tables, 58 catalogued defects, checklists |
+| **Playbook** (reusable) | `01_method/`, `04_patterns/` | 10 stages plus 8 non-visual subsystem docs (including `18_engine_ports.md` for apps you cross-compile instead of rewriting), entry/exit gates, Compose→SwiftUI mapping tables, 60 catalogued defects, checklists |
 | **Case study** | `02_case_study/`, `03_rea/`, `06_evidence/` | commit-by-commit timeline, defects with root cause and proof, parity ledger, a measured atlas of [Breezy Weather 6.2.2](https://github.com/breezy-weather/breezy-weather), REA findings we acted on, screenshots and logs |
 
 ## The 10 stages
@@ -100,6 +100,7 @@ game is not rewritten at all.
 | What it does not add | any game logic, any layout, any string. The UI *is* the APK's own style data |
 | Dependency stack built for iOS | axmol `2.11.2.3j`, Boost `1.91.0`, jsoncpp `1.9.6`, EnTT `v3.16.0`, iscool-core `1.31.2`, moFileReader, libfpm, OpenAL Soft |
 | Verification | both architectures link; a seam-driven simulator run reaches the live production server, matches, plays and scores; safe area, icon, audio-at-the-API and the packaged-plist keys are each checked separately |
+| **Surface inventory** | [01_port/PARITY_INVENTORY.md](https://github.com/PriyanshuNaredi/bim-ios-port/blob/main/01_port/PARITY_INVENTORY.md) — every screen, popup, part and endpoint, each with the evidence behind its status; seams compiled out of device builds |
 | Release artefact | 31.6 MB unsigned IPA, arm64, iOS 17+, portrait, no `_CodeSignature`; CI builds it from a fresh clone and publishes it on the tag |
 | Defects found and fixed | 9, and **all nine are toolchain defects** — none are gameplay or UI logic (§50–§58) |
 | Deliberate gaps | in-app purchases (the server redeems Google Play tokens, so no client-side work can port them), plus everything only a phone can confirm: audibility, haptics, performance |
