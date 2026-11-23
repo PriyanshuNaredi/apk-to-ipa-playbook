@@ -17,7 +17,7 @@ build their unsigned IPA in CI:
 | Upstream size | 2,144 lines Kotlin | 1,358 Kotlin files, ~136,700 lines, 6 modules | C++ game, 300k lines, axmol engine, version 17 |
 | Kind of port | Compose → SwiftUI rewrite | Compose → SwiftUI rewrite | **cross-compile the same source**, replace the platform layer |
 | Port | [weather-ios-port](https://github.com/PriyanshuNaredi/weather-ios-port) | **[Gust](https://github.com/PriyanshuNaredi/gust)** | [bim-ios-port](https://github.com/PriyanshuNaredi/bim-ios-port) (private until the device run is done) |
-| CI + IPA | [run green](https://github.com/PriyanshuNaredi/weather-ios-port/actions/runs/43656216367); IPA + sha256 on [v1.1.1-6](https://github.com/PriyanshuNaredi/weather-ios-port/releases/tag/v1.1.1-6) | [run green](https://github.com/PriyanshuNaredi/gust/actions/runs/43729204363); 1.79 MB IPA on [v0.2.0](https://github.com/PriyanshuNaredi/gust/releases/tag/v0.2.0) |
+| CI + IPA | [run green](https://github.com/PriyanshuNaredi/weather-ios-port/actions/runs/43656216367); IPA + sha256 on [v1.1.1-6](https://github.com/PriyanshuNaredi/weather-ios-port/releases/tag/v1.1.1-6) | [run green](https://github.com/PriyanshuNaredi/gust/actions/runs/43729204363); 1.79 MB IPA on [v0.2.0](https://github.com/PriyanshuNaredi/gust/releases/tag/v0.2.0) | [run green](https://github.com/PriyanshuNaredi/bim-ios-port/actions/runs/45122506021); 30.1 MB IPA on [v17-ios.1](https://github.com/PriyanshuNaredi/bim-ios-port/releases/tag/v17-ios.1) |
 | Swift written | 6,079 lines across 30 files | 8,157 lines across 61 files | **none** — one app target + 4 patches + 21 scripted edits |
 | Tests | 87 logic + 11 UI | 99 logic + 10 UI | no unit tests exist; verification is architectural (both arches, seams, artefact checks) |
 | Defects it produced | 22 (`02_case_study/DEFECTS.md`) | 12 more catalogued (§31–§42), after the audit of the upstream | 9 more, all in the toolchain (§50–§58) |
@@ -100,7 +100,7 @@ game is not rewritten at all.
 | What it does not add | any game logic, any layout, any string. The UI *is* the APK's own style data |
 | Dependency stack built for iOS | axmol `2.11.2.3j`, Boost `1.91.0`, jsoncpp `1.9.6`, EnTT `v3.16.0`, iscool-core `1.31.2`, moFileReader, libfpm, OpenAL Soft |
 | Verification | both architectures link; a seam-driven simulator run reaches the live production server, matches, plays and scores; safe area, icon, audio-at-the-API and the packaged-plist keys are each checked separately |
-| Release artefact | 31.6 MB unsigned IPA, arm64, iOS 17+, portrait, no `_CodeSignature` |
+| Release artefact | 31.6 MB unsigned IPA, arm64, iOS 17+, portrait, no `_CodeSignature`; CI builds it from a fresh clone and publishes it on the tag |
 | Defects found and fixed | 9, and **all nine are toolchain defects** — none are gameplay or UI logic (§50–§58) |
 | Deliberate gaps | in-app purchases (the server redeems Google Play tokens, so no client-side work can port them), plus everything only a phone can confirm: audibility, haptics, performance |
 | Licence outcome | AGPL-3.0: the port *is* a derivative work, so it ships upstream's `COPYING` and a full `CREDITS.md` |
